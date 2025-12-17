@@ -3,93 +3,101 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AI Troubleshooting Agent</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>AI Agent Cirrascale</title>
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <header class="topbar">
     <div class="brand">
-      <div class="logo">AT</div>
+      <div class="logo" aria-hidden="true">CS</div>
       <div>
-        <h1>AI Troubleshooting Agent</h1>
-        <p class="sub">Intake → Clarify → Diagnose → Steps → Report</p>
+        <div class="title">AI Agent Cirrascale</div>
+        <div class="subtitle">Browser-based AI agent • GitHub Pages</div>
       </div>
     </div>
-    <div class="status">
-      <span class="dot" id="modeDot"></span>
-      <span id="modeLabel">Local Playbook Mode</span>
+
+    <div class="actions">
+      <select id="providerSelect" class="select" aria-label="Model provider">
+        <option value="demo">Demo (offline)</option>
+        <option value="openai_compatible">OpenAI-Compatible (via proxy)</option>
+      </select>
+
+      <button id="clearBtn" class="btn btn-secondary" type="button">Clear</button>
+      <button id="settingsBtn" class="btn" type="button">Settings</button>
     </div>
   </header>
 
-  <main class="grid">
-    <section class="card">
-      <h2>1) Intake</h2>
-      <label class="label">Issue Category</label>
-      <select id="category">
-        <option value="network">Network</option>
-        <option value="hardware">Hardware</option>
-        <option value="os">OS</option>
-        <option value="account">Account / Access</option>
-        <option value="app">Application</option>
-      </select>
+  <main class="layout">
+    <section class="chat">
+      <div id="messages" class="messages" aria-live="polite"></div>
 
-      <label class="label">Device / OS</label>
-      <div class="row">
-        <select id="device">
-          <option value="macos">macOS</option>
-          <option value="windows">Windows</option>
-          <option value="linux">Linux</option>
-        </select>
-        <select id="context">
-          <option value="onsite">Onsite</option>
-          <option value="remote">Remote</option>
-        </select>
-      </div>
+      <form id="composer" class="composer" autocomplete="off">
+        <textarea
+          id="input"
+          class="input"
+          placeholder="Message Cirrascale…"
+          rows="1"
+          required
+        ></textarea>
 
-      <label class="label">Problem Description</label>
-      <textarea id="description" rows="6" placeholder="Describe symptoms, error messages, what changed, and impact..."></textarea>
-
-      <div class="row">
-        <button id="analyzeBtn" class="primary">Analyze</button>
-        <button id="resetBtn" class="ghost">Reset</button>
-      </div>
+        <button id="sendBtn" class="btn btn-primary" type="submit">Send</button>
+      </form>
 
       <div class="hint">
-        Tip: Include exact error text, timestamps, and what was attempted.
+        Tip: Press <kbd>Enter</kbd> to send, <kbd>Shift</kbd>+<kbd>Enter</kbd> for a newline.
       </div>
     </section>
 
-    <section class="card">
-      <h2>2) Clarifying Questions</h2>
-      <div id="questions" class="stack muted">
-        Run “Analyze” to generate questions.
-      </div>
-    </section>
+    <aside class="panel">
+      <div class="panel-card">
+        <h2>Agent Profile</h2>
+        <label class="label">System instructions</label>
+        <textarea id="systemPrompt" class="textarea" rows="10"></textarea>
 
-    <section class="card">
-      <h2>3) Diagnosis & Recommended Steps</h2>
-      <div id="output" class="stack muted">
-        Recommendations will appear here.
+        <label class="label">Memory</label>
+        <div class="muted">
+          Conversation is stored locally in your browser (LocalStorage) unless you clear it.
+        </div>
       </div>
 
-      <div class="row">
-        <button id="exportBtn" class="secondary" disabled>Export Report</button>
-        <button id="copyBtn" class="ghost" disabled>Copy</button>
-      </div>
-    </section>
+      <div class="panel-card">
+        <h2>Provider Settings</h2>
 
-    <section class="card">
-      <h2>Playbook Hits</h2>
-      <div id="playbookHits" class="stack muted">
-        Matching procedures will show here.
+        <div id="openaiSettings" class="provider">
+          <label class="label">API base URL (proxy)</label>
+          <input id="apiBaseUrl" class="text" placeholder="https://your-proxy.example.com" />
+
+          <label class="label">Model</label>
+          <input id="model" class="text" placeholder="gpt-4.1-mini (example)" />
+
+          <div class="muted">
+            Do not put API keys in the browser. Use a serverless proxy that injects secrets server-side.
+          </div>
+        </div>
+
+        <div id="demoSettings" class="provider">
+          <div class="muted">
+            Demo mode runs fully offline to validate UI/flows. Switch provider when your proxy is ready.
+          </div>
+        </div>
+
+        <button id="saveSettingsBtn" class="btn btn-secondary" type="button">Save settings</button>
       </div>
-    </section>
+    </aside>
   </main>
 
-  <footer class="footer">
-    <span>Static GitHub Pages UI. Optional backend supported.</span>
-  </footer>
+  <dialog id="settingsDialog" class="dialog">
+    <form method="dialog" class="dialog-inner">
+      <h2>Settings</h2>
+      <p class="muted">
+        Settings are stored locally in your browser. For GitHub Pages deployments, this is expected.
+      </p>
+      <menu class="dialog-actions">
+        <button class="btn btn-secondary" value="cancel">Close</button>
+      </menu>
+    </form>
+  </dialog>
 
-  <script src="app.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>
