@@ -3,6 +3,10 @@
   const themeToggle = document.getElementById("themeToggle");
   const copyAgentLinkBtn = document.getElementById("copyAgentLink");
 
+  // Your published GPT link (single source of truth)
+  const AGENT_URL =
+    "https://chatgpt.com/g/g-69441b1b5d0c81918300df5e63b0e079-ai-infrastructure-troubleshooting-agent";
+
   // Set initial theme from localStorage (default dark)
   const storedTheme = localStorage.getItem("theme");
   if (storedTheme === "light") {
@@ -15,11 +19,6 @@
     toast.classList.add("show");
     window.clearTimeout(showToast._t);
     showToast._t = window.setTimeout(() => toast.classList.remove("show"), 1600);
-  }
-
-  function getAgentLink() {
-    const a = document.getElementById("agentLinkHero") || document.getElementById("agentLinkTop");
-    return a ? a.href : "";
   }
 
   async function copyText(text) {
@@ -54,12 +53,10 @@
     });
   }
 
-  // Copy agent link
+  // Copy agent link (uses AGENT_URL)
   if (copyAgentLinkBtn) {
     copyAgentLinkBtn.addEventListener("click", async () => {
-      const link = getAgentLink();
-      if (!link) return showToast("Agent link not found.");
-      const ok = await copyText(link);
+      const ok = await copyText(AGENT_URL);
       showToast(ok ? "Agent link copied." : "Copy failed.");
     });
   }
