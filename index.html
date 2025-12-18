@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="description" content="Showcase for a change-controlled infrastructure troubleshooting AI agent (servers, switches, routers, scripts, and hardware)." />
-  <title>Infrastructure Troubleshooting Agent</title>
+  <title>AI Infrastructure Troubleshooting Agent</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
       <div class="brand">
         <div class="logo" aria-hidden="true">AI</div>
         <div>
-          <div class="brand-title">Infrastructure Troubleshooting Agent</div>
+          <div class="brand-title">AI Infrastructure Troubleshooting Agent</div>
           <div class="brand-subtitle">Servers • Switches • Routers • Scripts • Hardware</div>
         </div>
       </div>
@@ -31,7 +31,9 @@
 
       <div class="header-actions">
         <button class="btn btn-ghost" id="themeToggle" type="button" aria-label="Toggle theme">Theme</button>
-        <a class="btn btn-primary" id="agentLinkTop" href="https://chatgpt.com/g/YOUR_AGENT_ID" target="_blank" rel="noreferrer">
+        <a class="btn btn-primary" id="agentLinkTop"
+           href="https://chatgpt.com/g/g-69441b1b5d0c81918300df5e63b0e079-ai-infrastructure-troubleshooting-agent"
+           target="_blank" rel="noreferrer">
           Launch Agent
         </a>
       </div>
@@ -43,16 +45,18 @@
     <section class="hero">
       <div class="container hero-grid">
         <div class="hero-copy">
-          <p class="badge">Published Agent • Change-Controlled Remediation</p>
+          <p class="badge">Published GPT • Change-Controlled Remediation</p>
           <h1>Operational-grade troubleshooting with safe, approval-gated fixes.</h1>
           <p class="lead">
             This agent standardizes how incidents are triaged, diagnosed, and remediated across networking, servers,
             automation scripts, and hardware components. It uses a two-stage approach: <strong>Diagnostics</strong>
-            (read-only) and <strong>Remediation</strong> (requires approval).
+            (read-only) and <strong>Remediation</strong> (requires explicit approval).
           </p>
 
           <div class="cta-row">
-            <a class="btn btn-primary btn-lg" id="agentLinkHero" href="https://chatgpt.com/g/YOUR_AGENT_ID" target="_blank" rel="noreferrer">
+            <a class="btn btn-primary btn-lg" id="agentLinkHero"
+               href="https://chatgpt.com/g/g-69441b1b5d0c81918300df5e63b0e079-ai-infrastructure-troubleshooting-agent"
+               target="_blank" rel="noreferrer">
               Launch Agent
             </a>
             <button class="btn btn-secondary btn-lg" id="copyAgentLink" type="button">
@@ -62,7 +66,7 @@
 
           <div class="mini-stats">
             <div class="stat">
-              <div class="stat-value">2-Brain</div>
+              <div class="stat-value">Two-mode</div>
               <div class="stat-label">Diagnostics → Remediation</div>
             </div>
             <div class="stat">
@@ -88,11 +92,11 @@
               <li><span class="check">✓</span> Hypothesis-driven diagnostics</li>
               <li><span class="check">✓</span> Evidence requests (commands + expected output)</li>
               <li><span class="check">✓</span> Remediation plan + rollback + validation</li>
-              <li><span class="check">✓</span> Approval gate before risky steps</li>
+              <li><span class="check">✓</span> Explicit approval before change steps</li>
             </ul>
 
             <div class="card-footer">
-              <div class="muted">Tip: Paste logs, screenshots, or full scripts. The agent will route automatically.</div>
+              <div class="muted">Tip: Paste logs, screenshots, or full scripts. The agent will guide your next best step.</div>
             </div>
           </div>
         </div>
@@ -113,7 +117,7 @@
             <p>Switch/router triage, interface errors, VLAN/trunk, STP, routing adjacencies, packet loss, MTU.</p>
             <div class="tags">
               <span class="tag">L1–L4 isolation</span>
-              <span class="tag">Cisco-style CLI</span>
+              <span class="tag">CLI outputs</span>
               <span class="tag">Routing/Layer2</span>
             </div>
           </article>
@@ -130,11 +134,11 @@
 
           <article class="feature">
             <h3>Script Troubleshooting</h3>
-            <p>Paste errors, screenshots, or full scripts. Detects PowerShell, Python, Bash, Ansible, Terraform, YAML.</p>
+            <p>Paste errors, screenshots, or full scripts. Supports PowerShell, Python, Bash, Ansible, Terraform, YAML.</p>
             <div class="tags">
               <span class="tag">Stack traces</span>
               <span class="tag">Root cause</span>
-              <span class="tag">Fixed snippet</span>
+              <span class="tag">Corrected snippet</span>
             </div>
           </article>
 
@@ -155,8 +159,8 @@
     <section class="section" id="workflow">
       <div class="container">
         <div class="section-head">
-          <h2>Two-brain workflow</h2>
-          <p class="muted">Diagnostics is read-only. Remediation is approval-gated and includes rollback + validation.</p>
+          <h2>Workflow</h2>
+          <p class="muted">Diagnostics first; remediation only after explicit user approval.</p>
         </div>
 
         <div class="workflow">
@@ -164,12 +168,12 @@
             <div class="workflow-step">
               <div class="step-num">1</div>
               <div>
-                <h3>Diagnostics (no approval required)</h3>
-                <p>Collect facts, isolate layer/domain, propose likely causes, provide safe checks and evidence requests.</p>
+                <h3>Diagnostics (default)</h3>
+                <p>Read-only triage + hypothesis-driven verification steps. Produces a remediation plan.</p>
                 <ul class="bullets">
                   <li>Symptoms → Likely Causes → Diagnostics → Interpretation</li>
-                  <li>Expected outputs (“good vs bad” patterns)</li>
-                  <li>Produces a proposed remediation plan</li>
+                  <li>Commands to run + expected outputs</li>
+                  <li>Escalation guidance when needed</li>
                 </ul>
               </div>
             </div>
@@ -177,8 +181,8 @@
             <div class="workflow-step">
               <div class="step-num">2</div>
               <div>
-                <h3>Remediation (approval required)</h3>
-                <p>Only after explicit user intent + approval. Outputs change steps with risk, rollback, and validation.</p>
+                <h3>Remediation (explicit approval)</h3>
+                <p>Step-by-step changes with risk, rollback, and validation checklist.</p>
                 <ul class="bullets">
                   <li>Change Summary → Preconditions → Steps</li>
                   <li>Rollback/backout plan</li>
@@ -189,7 +193,6 @@
           </div>
 
           <div class="workflow-diagram" aria-label="Workflow diagram">
-            <!-- SVG diagram (no external assets needed) -->
             <svg viewBox="0 0 860 360" role="img" aria-label="Diagnostics to approval to remediation flow">
               <defs>
                 <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
@@ -199,22 +202,21 @@
               </defs>
 
               <rect x="20" y="30" width="250" height="110" rx="18" fill="url(#g)" stroke="currentColor" stroke-opacity="0.22"/>
-              <text x="45" y="75" fill="currentColor" font-size="18" font-weight="600">Brain: Diagnostics</text>
+              <text x="45" y="75" fill="currentColor" font-size="18" font-weight="600">Diagnostics</text>
               <text x="45" y="105" fill="currentColor" font-size="13" opacity="0.8">Read-only checks + plan</text>
 
               <rect x="310" y="30" width="250" height="110" rx="18" fill="url(#g)" stroke="currentColor" stroke-opacity="0.22"/>
               <text x="335" y="75" fill="currentColor" font-size="18" font-weight="600">Intent Gate</text>
-              <text x="335" y="105" fill="currentColor" font-size="13" opacity="0.8">User requests changes?</text>
+              <text x="335" y="105" fill="currentColor" font-size="13" opacity="0.8">User requests changes</text>
 
               <rect x="600" y="30" width="240" height="110" rx="18" fill="url(#g)" stroke="currentColor" stroke-opacity="0.22"/>
-              <text x="625" y="75" fill="currentColor" font-size="18" font-weight="600">Approval Required</text>
-              <text x="625" y="105" fill="currentColor" font-size="13" opacity="0.8">Human confirmation</text>
+              <text x="625" y="75" fill="currentColor" font-size="18" font-weight="600">Approval</text>
+              <text x="625" y="105" fill="currentColor" font-size="13" opacity="0.8">Confirm maintenance/rollback</text>
 
               <rect x="600" y="200" width="240" height="110" rx="18" fill="url(#g)" stroke="currentColor" stroke-opacity="0.22"/>
-              <text x="625" y="245" fill="currentColor" font-size="18" font-weight="600">Brain: Remediation</text>
+              <text x="625" y="245" fill="currentColor" font-size="18" font-weight="600">Remediation</text>
               <text x="625" y="275" fill="currentColor" font-size="13" opacity="0.8">Steps + rollback + validation</text>
 
-              <!-- arrows -->
               <path d="M270 85 L310 85" stroke="currentColor" stroke-opacity="0.4" stroke-width="3" fill="none"/>
               <polygon points="310,85 298,78 298,92" fill="currentColor" opacity="0.4"/>
 
@@ -224,9 +226,8 @@
               <path d="M720 140 L720 200" stroke="currentColor" stroke-opacity="0.4" stroke-width="3" fill="none"/>
               <polygon points="720,200 713,188 727,188" fill="currentColor" opacity="0.4"/>
 
-              <!-- reject/else -->
               <path d="M435 140 C435 220, 120 220, 120 140" stroke="currentColor" stroke-opacity="0.22" stroke-width="3" fill="none"/>
-              <text x="110" y="240" fill="currentColor" font-size="12" opacity="0.65">Else/Reject → stop or continue diagnosing</text>
+              <text x="110" y="240" fill="currentColor" font-size="12" opacity="0.65">If not approved → continue diagnostics</text>
             </svg>
           </div>
         </div>
@@ -285,9 +286,9 @@ Provide safe diagnostics and escalation guidance.</pre>
         </div>
 
         <div class="callout">
-          <div class="callout-title">Want a one-click “Launch + Prompt” workflow?</div>
+          <div class="callout-title">Fast incident workflow</div>
           <div class="callout-body">
-            GitHub Pages can’t embed the agent UI, but you can link to the agent and keep prompt templates here for fast copy/paste during incidents.
+            Use this page to copy prompts and launch the agent. Paste outputs back into tickets for consistent, escalation-ready notes.
           </div>
         </div>
       </div>
@@ -312,21 +313,21 @@ Provide safe diagnostics and escalation guidance.</pre>
           <details>
             <summary>Why is remediation approval-gated?</summary>
             <div class="faq-content">
-              To match enterprise change-control practices. Diagnostics remains read-only; remediation is only provided after explicit intent and approval.
+              To match enterprise change-control practices. Diagnostics remains read-only; remediation is provided only after explicit approval.
             </div>
           </details>
 
           <details>
             <summary>Can I paste screenshots of errors?</summary>
             <div class="faq-content">
-              Yes. Paste screenshots or text. The agent will extract key details and proceed through the appropriate troubleshooting workflow.
+              Yes. Paste screenshots or text. The agent will extract key details and guide the next best steps.
             </div>
           </details>
 
           <details>
             <summary>What should I save in tickets?</summary>
             <div class="faq-content">
-              Copy the Diagnostics section (symptoms, scope, tests run, interpretations) and the Remediation section (steps, rollback, validation) when used.
+              Copy the Diagnostics summary (symptoms, scope, tests run, interpretations) and the Remediation steps (steps, rollback, validation) when used.
             </div>
           </details>
         </div>
@@ -336,12 +337,16 @@ Provide safe diagnostics and escalation guidance.</pre>
     <footer class="footer">
       <div class="container footer-inner">
         <div>
-          <div class="footer-title">Infrastructure Troubleshooting Agent</div>
+          <div class="footer-title">AI Infrastructure Troubleshooting Agent</div>
           <div class="muted">A change-controlled operational assistant for IT troubleshooting.</div>
         </div>
         <div class="footer-links">
           <a href="#top">Back to top</a>
-          <a id="agentLinkFooter" href="https://chatgpt.com/g/YOUR_AGENT_ID" target="_blank" rel="noreferrer">Launch Agent</a>
+          <a id="agentLinkFooter"
+             href="https://chatgpt.com/g/g-69441b1b5d0c81918300df5e63b0e079-ai-infrastructure-troubleshooting-agent"
+             target="_blank" rel="noreferrer">
+            Launch Agent
+          </a>
         </div>
       </div>
     </footer>
