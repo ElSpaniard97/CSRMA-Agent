@@ -3,393 +3,95 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Showcase for a change-controlled infrastructure troubleshooting AI agent (servers, switches, routers, scripts, and hardware)." />
   <title>AI Infrastructure Troubleshooting Agent</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="style.css" />
+  <meta name="description" content="A change-controlled troubleshooting GPT for servers, networking, scripts, and hardware." />
+  <link rel="stylesheet" href="./assets/css/main.css" />
 </head>
-
 <body>
-  <!-- Sticky Quick Actions -->
-  <div class="quickbar" role="region" aria-label="Quick actions">
-    <div class="container quickbar-inner">
-      <div class="quickbar-left">
-        <span class="pill">Published GPT</span>
-        <span class="quickbar-title">AI Infrastructure Troubleshooting Agent</span>
-      </div>
-      <div class="quickbar-actions">
-        <a class="btn btn-primary btn-sm" id="agentLinkQuick"
-           href="https://chatgpt.com/g/g-69441b1b5d0c81918300df5e63b0e079-ai-infrastructure-troubleshooting-agent"
-           target="_blank" rel="noreferrer">Launch</a>
-        <button class="btn btn-secondary btn-sm" id="copyAgentLinkQuick" type="button">Copy Link</button>
-        <a class="btn btn-ghost btn-sm" href="#prompts">Prompts</a>
-      </div>
-    </div>
-  </div>
-
-  <header class="site-header" id="top">
+  <header class="header">
     <div class="container header-inner">
-      <a class="brand" href="#top">
-        <div class="logo" aria-hidden="true">AI</div>
-        <div>
+      <a class="brand" href="./index.html">
+        <div class="mark">AI</div>
+        <div class="brand-text">
           <div class="brand-title">AI Infrastructure Troubleshooting Agent</div>
-          <div class="brand-subtitle">Servers • Switches • Routers • Scripts • Hardware</div>
+          <div class="brand-subtitle">Diagnostics-first • Approval-gated remediation</div>
         </div>
       </a>
 
-      <button class="icon-btn" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false">
-        <span class="icon-lines" aria-hidden="true"></span>
-      </button>
-
-      <nav class="nav" id="mainNav" aria-label="Primary navigation">
-        <a href="#capabilities" data-nav="capabilities">Capabilities</a>
-        <a href="#workflow" data-nav="workflow">Workflow</a>
-        <a href="#prompts" data-nav="prompts">Prompts</a>
-        <a href="#faq" data-nav="faq">FAQ</a>
-        <div class="nav-actions">
-          <button class="btn btn-ghost btn-sm" id="themeToggle" type="button">Theme</button>
-          <a class="btn btn-primary btn-sm" id="agentLinkTop"
-             href="https://chatgpt.com/g/g-69441b1b5d0c81918300df5e63b0e079-ai-infrastructure-troubleshooting-agent"
-             target="_blank" rel="noreferrer">Launch Agent</a>
-        </div>
+      <nav class="nav" aria-label="Primary">
+        <a class="nav-link is-active" href="./index.html">Home</a>
+        <a class="nav-link" href="./capabilities.html">Capabilities</a>
+        <a class="nav-link" href="./workflow.html">Workflow</a>
+        <a class="nav-link" href="./prompts.html">Prompts</a>
+        <a class="nav-link" href="./faq.html">FAQ</a>
       </nav>
+
+      <div class="actions">
+        <button class="btn btn-ghost" id="themeToggle" type="button">Theme</button>
+        <a class="btn btn-primary" id="launchBtn"
+           href="https://chatgpt.com/g/g-69441b1b5d0c81918300df5e63b0e079-ai-infrastructure-troubleshooting-agent"
+           target="_blank" rel="noreferrer">Launch</a>
+      </div>
     </div>
   </header>
 
-  <main>
-    <!-- HERO -->
+  <main class="container">
     <section class="hero">
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <p class="badge">Change-Controlled • Diagnostics First • Approval-Gated Remediation</p>
-          <h1>Faster triage. Safer fixes. Better tickets.</h1>
-          <p class="lead">
-            Use this GPT to troubleshoot servers, network devices, scripts, and hardware alerts using a structured,
-            enterprise-style workflow. It starts in <strong>Diagnostics</strong> mode and only provides
-            step-by-step <strong>Remediation</strong> after explicit approval.
-          </p>
+      <p class="pill">Published GPT</p>
+      <h1>Faster triage. Safer fixes.</h1>
+      <p class="lead">
+        A structured troubleshooting assistant for <strong>servers</strong>, <strong>switches/routers</strong>,
+        <strong>scripts</strong>, and <strong>hardware alerts</strong>. Starts in diagnostics mode and requires explicit approval
+        before remediation steps.
+      </p>
 
-          <div class="cta-row">
-            <a class="btn btn-primary btn-lg" id="agentLinkHero"
-               href="https://chatgpt.com/g/g-69441b1b5d0c81918300df5e63b0e079-ai-infrastructure-troubleshooting-agent"
-               target="_blank" rel="noreferrer">Launch Agent</a>
-            <button class="btn btn-secondary btn-lg" id="copyAgentLink" type="button">Copy Agent Link</button>
-            <a class="btn btn-ghost btn-lg" href="#prompts">Use Prompt Library</a>
-          </div>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://chatgpt.com/g/g-69441b1b5d0c81918300df5e63b0e079-ai-infrastructure-troubleshooting-agent" target="_blank" rel="noreferrer">Launch Agent</a>
+        <button class="btn btn-secondary" id="copyAgentLink" type="button">Copy Link</button>
+      </div>
 
-          <div class="mini-stats">
-            <div class="stat">
-              <div class="stat-value">Multi-domain</div>
-              <div class="stat-label">Net • OS • Scripts • HW</div>
-            </div>
-            <div class="stat">
-              <div class="stat-value">Operational format</div>
-              <div class="stat-label">Triage → Evidence → Plan</div>
-            </div>
-            <div class="stat">
-              <div class="stat-value">Change control</div>
-              <div class="stat-label">Approval + rollback</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="hero-card" role="region" aria-label="Agent overview card">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">What you’ll get</div>
-              <div class="card-subtitle">Consistent outputs you can paste into tickets.</div>
-            </div>
-
-            <ul class="checklist">
-              <li><span class="check">✓</span> Impact + scope questions (fast triage)</li>
-              <li><span class="check">✓</span> Likely causes + verification steps</li>
-              <li><span class="check">✓</span> “Run this command” + what to look for</li>
-              <li><span class="check">✓</span> Remediation plan + rollback + validation</li>
-            </ul>
-
-            <div class="card-footer">
-              <div class="muted">Tip: paste text, screenshots, or full scripts. The GPT adapts.</div>
-            </div>
-          </div>
-        </div>
+      <div class="cards">
+        <article class="card">
+          <div class="card-title">Diagnostics-first</div>
+          <div class="card-text">Evidence-driven, read-only verification commands and interpretation.</div>
+        </article>
+        <article class="card">
+          <div class="card-title">Change control</div>
+          <div class="card-text">Remediation is approval-gated and includes rollback + validation.</div>
+        </article>
+        <article class="card">
+          <div class="card-title">Multi-domain</div>
+          <div class="card-text">Networking, OS/services, scripts/automation, and hardware components.</div>
+        </article>
       </div>
     </section>
 
-    <!-- CAPABILITIES -->
-    <section class="section" id="capabilities">
-      <div class="container">
-        <div class="section-head">
-          <h2>Capabilities</h2>
-          <p class="muted">Designed for real incident workflows.</p>
-        </div>
-
-        <div class="grid-4">
-          <article class="feature">
-            <h3>Networking</h3>
-            <p>Switch/router triage, interface errors, VLAN/trunk, STP, routing, loss, MTU.</p>
-            <div class="tags">
-              <span class="tag">L1–L4 isolation</span>
-              <span class="tag">CLI outputs</span>
-              <span class="tag">Layer2/Layer3</span>
-            </div>
-          </article>
-
-          <article class="feature">
-            <h3>Server OS / Services</h3>
-            <p>Linux/Windows: CPU, memory, disk, services, logs, ports, DNS, TLS, connectivity.</p>
-            <div class="tags">
-              <span class="tag">Linux</span>
-              <span class="tag">Windows</span>
-              <span class="tag">Service health</span>
-            </div>
-          </article>
-
-          <article class="feature">
-            <h3>Scripts / Automation</h3>
-            <p>PowerShell, Python, Bash, Ansible, Terraform, YAML/JSON. Root cause + corrected snippet.</p>
-            <div class="tags">
-              <span class="tag">Stack traces</span>
-              <span class="tag">Linting hints</span>
-              <span class="tag">Fix patterns</span>
-            </div>
-          </article>
-
-          <article class="feature">
-            <h3>Hardware</h3>
-            <p>Vendor-aware triage: iDRAC/iLO/IPMI; PSU, thermals, RAID, memory/ECC; escalation guidance.</p>
-            <div class="tags">
-              <span class="tag">Dell</span>
-              <span class="tag">HPE</span>
-              <span class="tag">BMC/IPMI</span>
-            </div>
-          </article>
-        </div>
+    <section class="section">
+      <div class="section-head">
+        <h2>Quick start</h2>
+        <p class="muted">Use prompts to standardize incident intake.</p>
       </div>
-    </section>
 
-    <!-- WORKFLOW -->
-    <section class="section" id="workflow">
-      <div class="container">
-        <div class="section-head">
-          <h2>Workflow</h2>
-          <p class="muted">Diagnostics first; remediation only after explicit approval.</p>
-        </div>
+      <div class="grid">
+        <a class="tile" href="./prompts.html">
+          <div class="tile-title">Open Prompt Library</div>
+          <div class="tile-text">Copy/paste starter prompts for common scenarios.</div>
+        </a>
 
-        <div class="workflow">
-          <div class="workflow-copy">
-            <div class="workflow-step">
-              <div class="step-num">1</div>
-              <div>
-                <h3>Diagnostics (default)</h3>
-                <p>Read-only triage + verification steps. Produces a remediation plan without change commands.</p>
-                <ul class="bullets">
-                  <li>Symptoms → Likely Causes → Diagnostics → Interpretation</li>
-                  <li>Commands to run + expected outputs</li>
-                  <li>Escalation guidance when needed</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="workflow-step">
-              <div class="step-num">2</div>
-              <div>
-                <h3>Remediation (explicit approval)</h3>
-                <p>Step-by-step changes with risk, rollback, and validation checklist.</p>
-                <ul class="bullets">
-                  <li>Change Summary → Preconditions → Steps</li>
-                  <li>Rollback/backout plan</li>
-                  <li>Validation checklist + post-change notes</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div class="workflow-diagram" aria-label="Workflow diagram">
-            <svg viewBox="0 0 860 360" role="img" aria-label="Diagnostics to approval to remediation flow">
-              <defs>
-                <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="currentColor" stop-opacity="0.18"/>
-                  <stop offset="100%" stop-color="currentColor" stop-opacity="0.06"/>
-                </linearGradient>
-              </defs>
-
-              <rect x="20" y="30" width="250" height="110" rx="18" fill="url(#g)" stroke="currentColor" stroke-opacity="0.22"/>
-              <text x="45" y="75" fill="currentColor" font-size="18" font-weight="600">Diagnostics</text>
-              <text x="45" y="105" fill="currentColor" font-size="13" opacity="0.8">Read-only checks + plan</text>
-
-              <rect x="310" y="30" width="250" height="110" rx="18" fill="url(#g)" stroke="currentColor" stroke-opacity="0.22"/>
-              <text x="335" y="75" fill="currentColor" font-size="18" font-weight="600">Intent Gate</text>
-              <text x="335" y="105" fill="currentColor" font-size="13" opacity="0.8">User requests changes</text>
-
-              <rect x="600" y="30" width="240" height="110" rx="18" fill="url(#g)" stroke="currentColor" stroke-opacity="0.22"/>
-              <text x="625" y="75" fill="currentColor" font-size="18" font-weight="600">Approval</text>
-              <text x="625" y="105" fill="currentColor" font-size="13" opacity="0.8">Confirm maintenance/rollback</text>
-
-              <rect x="600" y="200" width="240" height="110" rx="18" fill="url(#g)" stroke="currentColor" stroke-opacity="0.22"/>
-              <text x="625" y="245" fill="currentColor" font-size="18" font-weight="600">Remediation</text>
-              <text x="625" y="275" fill="currentColor" font-size="13" opacity="0.8">Steps + rollback + validation</text>
-
-              <path d="M270 85 L310 85" stroke="currentColor" stroke-opacity="0.4" stroke-width="3" fill="none"/>
-              <polygon points="310,85 298,78 298,92" fill="currentColor" opacity="0.4"/>
-
-              <path d="M560 85 L600 85" stroke="currentColor" stroke-opacity="0.4" stroke-width="3" fill="none"/>
-              <polygon points="600,85 588,78 588,92" fill="currentColor" opacity="0.4"/>
-
-              <path d="M720 140 L720 200" stroke="currentColor" stroke-opacity="0.4" stroke-width="3" fill="none"/>
-              <polygon points="720,200 713,188 727,188" fill="currentColor" opacity="0.4"/>
-
-              <path d="M435 140 C435 220, 120 220, 120 140" stroke="currentColor" stroke-opacity="0.22" stroke-width="3" fill="none"/>
-              <text x="110" y="240" fill="currentColor" font-size="12" opacity="0.65">No intent / no approval → safe stop</text>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PROMPTS -->
-    <section class="section" id="prompts">
-      <div class="container">
-        <div class="section-head">
-          <h2>Prompt library</h2>
-          <p class="muted">Search and filter, then copy/paste into the agent.</p>
-        </div>
-
-        <div class="prompt-controls">
-          <div class="search">
-            <label class="sr-only" for="promptSearch">Search prompts</label>
-            <input id="promptSearch" type="search" placeholder="Search prompts (e.g., VLAN, iDRAC, traceback, DNS)..." />
-          </div>
-
-          <div class="filters" role="group" aria-label="Prompt filters">
-            <button class="chip active" type="button" data-filter="all">All</button>
-            <button class="chip" type="button" data-filter="network">Networking</button>
-            <button class="chip" type="button" data-filter="server">Server</button>
-            <button class="chip" type="button" data-filter="script">Scripts</button>
-            <button class="chip" type="button" data-filter="hardware">Hardware</button>
-          </div>
-        </div>
-
-        <div class="grid-2" id="promptGrid">
-          <div class="prompt-card" data-category="network" data-keywords="network switch router vlan trunk stp routing interface mtu packet loss">
-            <div class="prompt-head">
-              <h3>Networking: VLAN reachability</h3>
-              <button class="btn btn-ghost btn-sm copy-btn" data-copy="Network uplink is up/up but users in VLAN 20 cannot reach the gateway. Outputs: show ip interface brief: <paste>; show interface <uplink>: <paste>; show spanning-tree vlan 20: <paste>. Diagnose read-only first.">Copy</button>
-            </div>
-            <pre class="prompt-body">Network uplink is up/up but users in VLAN 20 cannot reach the gateway. Outputs:
-show ip interface brief: &lt;paste&gt;
-show interface &lt;uplink&gt;: &lt;paste&gt;
-show spanning-tree vlan 20: &lt;paste&gt;
-Diagnose read-only first.</pre>
-          </div>
-
-          <div class="prompt-card" data-category="server" data-keywords="linux windows server service down slow cpu memory disk logs dns tls ports ss journalctl event viewer">
-            <div class="prompt-head">
-              <h3>Server: Intermittent outage</h3>
-              <button class="btn btn-ghost btn-sm copy-btn" data-copy="Linux server is slow and intermittently unreachable. Provide triage steps and commands. Context: distro/version: <paste>, ip a: <paste>, ip r: <paste>, journalctl tail: <paste>, ss -tulpn: <paste>.">Copy</button>
-            </div>
-            <pre class="prompt-body">Linux server is slow and intermittently unreachable. Provide triage steps and commands.
-Context: distro/version: &lt;paste&gt;, ip a: &lt;paste&gt;, ip r: &lt;paste&gt;, journalctl tail: &lt;paste&gt;, ss -tulpn: &lt;paste&gt;.</pre>
-          </div>
-
-          <div class="prompt-card" data-category="script" data-keywords="powershell python bash script error traceback exception stack trace terraform ansible yaml json ci pipeline">
-            <div class="prompt-head">
-              <h3>Scripts: Error analysis</h3>
-              <button class="btn btn-ghost btn-sm copy-btn" data-copy="Troubleshoot this script error. Language/tool: <PowerShell/Python/Bash/Terraform/Ansible>. Execution context: <local/CI/cron>. Error output: <paste>. If needed, I can paste the full script. Provide root cause and corrected snippet.">Copy</button>
-            </div>
-            <pre class="prompt-body">Troubleshoot this script error. Language/tool: &lt;PowerShell/Python/Bash/Terraform/Ansible&gt;.
-Execution context: &lt;local/CI/cron&gt;. Error output: &lt;paste&gt;.
-If needed, I can paste the full script. Provide root cause and corrected snippet.</pre>
-          </div>
-
-          <div class="prompt-card" data-category="hardware" data-keywords="hardware server idrac ilo ipmi bmc psu fan thermals raid memory ecc sel lifecycle">
-            <div class="prompt-head">
-              <h3>Hardware: BMC alert triage</h3>
-              <button class="btn btn-ghost btn-sm copy-btn" data-copy="Server hardware alert. Vendor/model: <paste>. BMC: <iDRAC/iLO/IPMI>. Symptoms: <paste>. Evidence: SEL/Lifecycle logs: <paste>, sensor readings: <paste>, RAID status: <paste>. Provide safe diagnostics and escalation guidance.">Copy</button>
-            </div>
-            <pre class="prompt-body">Server hardware alert. Vendor/model: &lt;paste&gt;. BMC: &lt;iDRAC/iLO/IPMI&gt;.
-Symptoms: &lt;paste&gt;. Evidence: SEL/Lifecycle logs: &lt;paste&gt;, sensor readings: &lt;paste&gt;, RAID status: &lt;paste&gt;.
-Provide safe diagnostics and escalation guidance.</pre>
-          </div>
-        </div>
-
-        <div class="empty-state" id="emptyState" hidden>
-          <div class="empty-title">No prompts matched your search.</div>
-          <div class="muted">Try removing filters or using a simpler keyword (e.g., “DNS”, “VLAN”, “traceback”).</div>
-        </div>
-
-        <div class="callout">
-          <div class="callout-title">Tip for faster tickets</div>
-          <div class="callout-body">
-            Paste the GPT’s Diagnostics output into your incident ticket, then add the Remediation section only if changes are approved.
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="section" id="faq">
-      <div class="container">
-        <div class="section-head">
-          <h2>FAQ</h2>
-          <p class="muted">Common questions about how to use the GPT safely.</p>
-        </div>
-
-        <div class="faq">
-          <details>
-            <summary>Can the GPT run commands on my systems?</summary>
-            <div class="faq-content">
-              No. It provides guidance, commands to run, and interpretation patterns. You remain in control of execution.
-            </div>
-          </details>
-
-          <details>
-            <summary>Why is remediation approval-gated?</summary>
-            <div class="faq-content">
-              To align with enterprise change control. Diagnostics is read-only; remediation requires explicit intent and approval.
-            </div>
-          </details>
-
-          <details>
-            <summary>Can I paste screenshots?</summary>
-            <div class="faq-content">
-              Yes. Paste screenshots or text. The GPT will extract the key details and proceed with structured diagnostics.
-            </div>
-          </details>
-
-          <details>
-            <summary>What should I save in tickets?</summary>
-            <div class="faq-content">
-              Save the Diagnostics summary (symptoms, scope, tests run, interpretation). Add Remediation steps (rollback + validation) only when used.
-            </div>
-          </details>
-        </div>
+        <a class="tile" href="./workflow.html">
+          <div class="tile-title">See the Workflow</div>
+          <div class="tile-text">Diagnostics → intent gate → approval → remediation.</div>
+        </a>
       </div>
     </section>
 
     <footer class="footer">
-      <div class="container footer-inner">
-        <div>
-          <div class="footer-title">AI Infrastructure Troubleshooting Agent</div>
-          <div class="muted">Showcase site for a published ChatGPT GPT.</div>
-        </div>
-        <div class="footer-links">
-          <a href="#top">Back to top</a>
-          <a id="agentLinkFooter"
-             href="https://chatgpt.com/g/g-69441b1b5d0c81918300df5e63b0e079-ai-infrastructure-troubleshooting-agent"
-             target="_blank" rel="noreferrer">Launch Agent</a>
-        </div>
-      </div>
+      <div class="muted">© Showcase site for your published GPT.</div>
+      <a class="link" href="https://chatgpt.com/g/g-69441b1b5d0c81918300df5e63b0e079-ai-infrastructure-troubleshooting-agent" target="_blank" rel="noreferrer">Launch GPT</a>
     </footer>
   </main>
 
-  <button class="fab" id="backToTop" type="button" aria-label="Back to top" hidden>↑</button>
-
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <script src="script.js"></script>
+  <script src="./assets/js/main.js"></script>
 </body>
 </html>
