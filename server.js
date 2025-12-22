@@ -11,67 +11,27 @@ import crypto from "crypto";
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-/* =========================
-   ENV VALIDATION
-========================= */
-function requireEnv(name) {
-  const v = process.env[name];
-  if (!v) throw new Error(`Missing required environment variable: ${name}`);
-  return v;
-}
-
-// Validate all required environment variables on startup
-const requiredEnvVars = [
-  "OPENAI_API_KEY",
-  "JWT_SECRET",
-  "ADMIN_USERNAME",
-  "ADMIN_PASSWORD_HASH"
-];
-
-console.log("Validating environment variables...");
-requiredEnvVars.forEach((varName) => {
-  try {
-    requireEnv(varName);
-    console.log(`✓ ${varName} is set`);
-  } catch (err) {
-    console.error(`✗ ${varName} is missing`);
-    if (varName === "ADMIN_PASSWORD_HASH") {
-      console.error(
-        "To generate a password hash, run: node -e \"console.log(require('bcryptjs').hashSync('your-password', 10))\""
-      );
-    }
-    process.exit(1);
-  }
-});
-
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 /* =========================
-   CORS CONFIGURATION
+   CORS
 ========================= */
 const ALLOWED_ORIGINS = new Set([
   "https://elspaniard97.github.io",
   "https://8fc1948.github.io",
   "http://localhost:5500",
-  "http://localhost:3000",
-  "http://localhost:8080",
-  "http://127.0.0.1:5500",
-  "http://127.0.0.1:3000",
-  "http://127.0.0.1:8080"
+  "http://localhost:3000"
 ]);
 
 app.use(
   cors({
     origin: (origin, cb) => {
-      // Allow requests with no origin (mobile apps, Postman, etc.)
       if (!origin) return cb(null, true);
       if (ALLOWED_ORIGINS.has(origin)) return cb(null, true);
-      console.warn(`CORS blocked origin: ${origin}`);
-      return cb(new Error(`CORS policy: Origin ${origin} is not allowed`), false);
+      return cb(new Error(`CORS blocked for origin: ${origin}`), false);
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
     optionsSuccessStatus: 204
   })
 );
@@ -79,42 +39,30 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 
 /* =========================
-   MULTER FILE UPLOAD
+   MULTER
 ========================= */
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { 
-    fileSize: 6 * 1024 * 1024, // 6MB for screenshots
-    files: 1
-  },
-  fileFilter: (req, file, cb) => {
-    // Only allow image files
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only image files are allowed"));
-    }
-  }
+  limits: { fileSize: 6 * 1024 * 1024 } // 6MB for screenshots/logs
 });
 
 const uploadScript = multer({
   storage: multer.memoryStorage(),
-  limits: { 
-    fileSize: 512 * 1024, // 512KB per script
-    files: 1
-  }
+  limits: { fileSize: 512 * 1024 } // 512KB per script (adjust as needed)
 });
 
 /* =========================
-   AUTHENTICATION
+   ENV + AUTH
 ========================= */
+function requireEnv(name) {
+  const v = process.env[name];
+  if (!v) throw new Error(`Missing env var: ${name}`);
+  return v;
+}
+
 function issueToken(username) {
   const secret = requireEnv("JWT_SECRET");
-  return jwt.sign(
-    { sub: username, iat: Math.floor(Date.now() / 1000) },
-    secret,
-    { expiresIn: "8h" }
-  );
+  return jwt.sign({ sub: username }, secret, { expiresIn: "8h" });
 }
 
 function authMiddleware(req, res, next) {
@@ -122,24 +70,19 @@ function authMiddleware(req, res, next) {
     const secret = requireEnv("JWT_SECRET");
     const auth = req.headers.authorization || "";
     const [scheme, token] = auth.split(" ");
-    
     if (scheme !== "Bearer" || !token) {
-      return res.status(401).json({ ok: false, error: "Unauthorized: Missing or invalid token" });
+      return res.status(401).json({ ok: false, error: "Unauthorized" });
     }
-    
     const payload = jwt.verify(token, secret);
-    req.user = payload;
+    req.user = payload; // payload.sub
     return next();
-  } catch (err) {
-    if (err.name === "TokenExpiredError") {
-      return res.status(401).json({ ok: false, error: "Unauthorized: Token expired" });
-    }
-    return res.status(401).json({ ok: false, error: "Unauthorized: Invalid token" });
+  } catch {
+    return res.status(401).json({ ok: false, error: "Unauthorized" });
   }
 }
 
 /* =========================
-   SETTINGS STORAGE
+   Settings store (optional; kept if you added it)
 ========================= */
 const SETTINGS_PATH = process.env.SETTINGS_PATH || "/data/settings.json";
 
@@ -156,30 +99,16 @@ function defaultSettings() {
 function sanitizeSettings(input) {
   const base = defaultSettings();
   const out = { ...base };
-  
   if (!input || typeof input !== "object") return out;
 
-  if (typeof input.defaultPreset === "string") {
-    out.defaultPreset = input.defaultPreset;
-  }
-  if (typeof input.expandOnPreset === "boolean") {
-    out.expandOnPreset = input.expandOnPreset;
-  }
-  if (typeof input.rememberApproval === "boolean") {
-    out.rememberApproval = input.rememberApproval;
-  }
-  if (typeof input.defaultApproval === "boolean") {
-    out.defaultApproval = input.defaultApproval;
-  }
-  if (["system", "dark", "light"].includes(input.theme)) {
-    out.theme = input.theme;
-  }
+  if (typeof input.defaultPreset === "string") out.defaultPreset = input.defaultPreset;
+  if (typeof input.expandOnPreset === "boolean") out.expandOnPreset = input.expandOnPreset;
+  if (typeof input.rememberApproval === "boolean") out.rememberApproval = input.rememberApproval;
+  if (typeof input.defaultApproval === "boolean") out.defaultApproval = input.defaultApproval;
+  if (input.theme === "system" || input.theme === "dark" || input.theme === "light") out.theme = input.theme;
 
   const allowedPresets = new Set(["", "network", "server", "script", "hardware"]);
-  if (!allowedPresets.has(out.defaultPreset)) {
-    out.defaultPreset = "";
-  }
-  
+  if (!allowedPresets.has(out.defaultPreset)) out.defaultPreset = "";
   return out;
 }
 
@@ -192,9 +121,8 @@ async function readJsonFile(filePath) {
     const raw = await fs.readFile(filePath, "utf8");
     const json = JSON.parse(raw);
     return json && typeof json === "object" ? json : {};
-  } catch (err) {
-    if (err.code === "ENOENT") return {};
-    throw err;
+  } catch {
+    return {};
   }
 }
 
@@ -206,7 +134,7 @@ async function writeJsonFileAtomic(filePath, obj) {
 }
 
 /* =========================
-   SCRIPT STORAGE
+   SCRIPT STORAGE (Render Disk)
 ========================= */
 const SCRIPTS_DIR = process.env.SCRIPTS_DIR || "/data/scripts";
 const SCRIPTS_INDEX_PATH = path.join(SCRIPTS_DIR, "index.json");
@@ -216,50 +144,36 @@ function userKey(req) {
 }
 
 function safeTextFromBuffer(buf) {
-  if (!Buffer.isBuffer(buf)) {
-    throw new Error("Invalid file buffer");
-  }
-  
-  // Reject files with null bytes (likely binary)
-  if (buf.includes(0)) {
-    throw new Error("File appears to be binary (null bytes found). Please upload text files only.");
-  }
+  // Basic text safety checks: reject null bytes and very binary-looking content.
+  if (!Buffer.isBuffer(buf)) throw new Error("Invalid file buffer");
+  if (buf.includes(0)) throw new Error("File appears to be binary (null bytes found).");
 
-  // Decode as UTF-8
+  // Decode as utf8
   const text = buf.toString("utf8");
 
-  // Reject files with excessive replacement characters (encoding issues)
-  const replacementCount = (text.match(/\uFFFD/g) || []).length;
-  if (replacementCount > 10) {
-    throw new Error("File encoding appears invalid. Please ensure UTF-8 encoding.");
-  }
+  // Heuristic: reject extremely high ratio of replacement chars
+  const replacement = (text.match(/\uFFFD/g) || []).length;
+  if (replacement > 10) throw new Error("File encoding looks invalid; please upload a UTF-8 text file.");
 
   return text;
 }
 
 function normalizeTags(tags) {
   if (!tags) return [];
-  if (Array.isArray(tags)) {
-    return tags
-      .map(String)
-      .map((t) => t.trim())
-      .filter(Boolean)
-      .slice(0, 20);
-  }
+  if (Array.isArray(tags)) return tags.map(String).map(t => t.trim()).filter(Boolean).slice(0, 20);
   return String(tags)
     .split(",")
-    .map((t) => t.trim())
+    .map(t => t.trim())
     .filter(Boolean)
     .slice(0, 20);
 }
 
 function detectLanguageByExt(filename = "") {
   const ext = filename.toLowerCase().split(".").pop();
-  const languageMap = {
+  const map = {
     ps1: "PowerShell",
     py: "Python",
     sh: "Bash",
-    bash: "Bash",
     yaml: "YAML",
     yml: "YAML",
     json: "JSON",
@@ -272,12 +186,9 @@ function detectLanguageByExt(filename = "") {
     cs: "C#",
     cpp: "C++",
     c: "C",
-    rb: "Ruby",
-    php: "PHP",
-    pl: "Perl",
     txt: "Text"
   };
-  return languageMap[ext] || "Text";
+  return map[ext] || "Text";
 }
 
 function newId() {
@@ -293,7 +204,7 @@ async function writeScriptsIndex(indexObj) {
 }
 
 function scriptFolder(username, scriptId) {
-  // Sanitize paths to prevent directory traversal
+  // keep paths controlled and predictable
   const safeUser = username.replace(/[^\w.-]/g, "_");
   const safeId = String(scriptId).replace(/[^\w-]/g, "");
   return path.join(SCRIPTS_DIR, safeUser, safeId);
@@ -309,7 +220,7 @@ async function saveScript(username, meta, contentText) {
   await fs.writeFile(scriptPath, contentText, "utf8");
   await fs.writeFile(metaPath, JSON.stringify(meta, null, 2), "utf8");
 
-  // Update index
+  // update index
   const indexObj = await readScriptsIndex();
   if (!indexObj[username]) indexObj[username] = {};
   indexObj[username][scriptId] = meta;
@@ -321,11 +232,8 @@ async function saveScript(username, meta, contentText) {
 async function listScripts(username) {
   const indexObj = await readScriptsIndex();
   const byUser = indexObj[username] || {};
-  return Object.values(byUser).sort((a, b) => {
-    const dateA = b.updatedAt || b.createdAt || "";
-    const dateB = a.updatedAt || a.createdAt || "";
-    return dateA.localeCompare(dateB);
-  });
+  return Object.values(byUser)
+    .sort((a, b) => (b.updatedAt || b.createdAt || "").localeCompare(a.updatedAt || a.createdAt || ""));
 }
 
 async function getScript(username, scriptId) {
@@ -335,25 +243,21 @@ async function getScript(username, scriptId) {
 
   const folder = scriptFolder(username, scriptId);
   const scriptPath = path.join(folder, "script.txt");
-  
-  try {
-    const content = await fs.readFile(scriptPath, "utf8");
-    return { meta, content };
-  } catch (err) {
-    console.error(`Failed to read script ${scriptId}:`, err);
-    return null;
-  }
+  const content = await fs.readFile(scriptPath, "utf8").catch(() => null);
+  if (content === null) return null;
+
+  return { meta, content };
 }
 
 async function deleteScript(username, scriptId) {
   const indexObj = await readScriptsIndex();
   if (!indexObj[username]?.[scriptId]) return false;
 
-  // Remove folder
+  // remove folder
   const folder = scriptFolder(username, scriptId);
   await fs.rm(folder, { recursive: true, force: true });
 
-  // Update index
+  // update index
   delete indexObj[username][scriptId];
   await writeScriptsIndex(indexObj);
   return true;
@@ -377,44 +281,35 @@ function approvalStateFromMessage(message) {
 }
 
 function buildSystemPrompt(approvalState) {
-  const base = `You are an enterprise infrastructure troubleshooting agent specializing in:
-- Networking (switches, routers, VLANs, routing, STP)
-- Server OS/Services (Linux, Windows, logs, performance)
-- Scripts/Automation (PowerShell, Python, Bash, Ansible, Terraform, YAML, JSON)
-- Hardware/Components (iDRAC, iLO, IPMI, RAID, thermals, PSU, ECC)
+  const base = `
+You are an enterprise infrastructure troubleshooting agent for:
+- Networking (switches/routers)
+- Server OS/services (Linux/Windows)
+- Scripts/automation (PowerShell/Python/Bash/Ansible/Terraform/YAML/JSON)
+- Hardware/component alerts (iDRAC/iLO/IPMI, RAID, thermals, PSU, ECC)
 
-OPERATING RULES:
-1. Diagnostics-first: Always start by clarifying scope, impact, recent changes, and collecting evidence
-2. Ticket-safe output: Never request or display secrets (keys, passwords). Recommend redaction for sensitive data
-3. Be explicit and structured: Provide commands/steps AND explain what to look for in the output
-4. Safety priority: Avoid risky or production-impacting changes unless explicit APPROVAL is confirmed
-5. Script references: When scripts are provided, reference them by NAME and cite approximate line ranges
+Operating rules:
+1) Diagnostics-first: Start by clarifying scope/impact, recent change, and collecting evidence.
+2) Ticket-safe output: Never request or output secrets (keys/passwords). Recommend redaction.
+3) Be explicit and structured: Provide commands/steps AND "what to look for".
+4) Safety: Avoid risky/production-impacting changes unless APPROVAL is confirmed.
+5) If scripts are provided: reference them by NAME and cite approximate line ranges.
 
-RESPONSE FORMAT (always follow this structure):
-A) Quick Triage (2-6 bullet points summarizing the situation)
-B) Likely Causes (ranked by probability with brief explanation)
-C) Evidence to Collect (specific commands + what to look for in output)
-D) Decision Tree / Next Steps (conditional logic based on findings)
-E) Remediation Plan (ONLY if APPROVED: change steps + rollback + validation)
+Approval policy:
+- If approval is NOT confirmed: provide ONLY diagnostics, verification commands, decision points, and safe mitigations that do not change production configuration.
+- If approval IS confirmed: provide a remediation plan with rollback + validation.
 
+Response format (always):
+A) Quick Triage (2-6 bullets)
+B) Likely Causes (ranked)
+C) Evidence to Collect (commands + what to look for)
+D) Decision Tree / Next Steps
+E) If APPROVED: Remediation Plan (change steps + rollback + validation)
 `;
 
-  if (approvalState === "approved") {
-    return base + `
-APPROVAL STATUS: ✓ APPROVED
-You may provide remediation plans that modify production configuration. Always include:
-- Explicit change steps with commands
-- Rollback procedure
-- Validation steps to confirm success
-- Risk assessment and prerequisites (backups, maintenance window, etc.)
-`;
-  } else {
-    return base + `
-APPROVAL STATUS: ✗ NOT APPROVED
-You are in diagnostics-only mode. Do NOT provide production-impacting remediation steps.
-Focus on data collection, analysis, and decision points. Suggest safe mitigations only.
-`;
-  }
+  return approvalState === "approved"
+    ? base + "\nApproval status: APPROVED. Remediation plan is allowed if appropriate.\n"
+    : base + "\nApproval status: NOT APPROVED. Diagnostics only; do NOT provide production-impacting remediation steps.\n";
 }
 
 function normalizeHistory(history) {
@@ -424,11 +319,10 @@ function normalizeHistory(history) {
       (x) =>
         x &&
         (x.role === "user" || x.role === "assistant") &&
-        typeof x.content === "string" &&
-        x.content.trim().length > 0
+        typeof x.content === "string"
     )
-    .slice(-12) // Keep last 12 messages for context
-    .map((x) => ({ role: x.role, content: x.content.trim() }));
+    .slice(-12)
+    .map((x) => ({ role: x.role, content: x.content }));
 }
 
 function addLineNumbers(text) {
@@ -438,118 +332,68 @@ function addLineNumbers(text) {
 
 function truncateText(text, maxChars) {
   if (text.length <= maxChars) return text;
-  const half = Math.floor(maxChars / 2);
-  return (
-    text.slice(0, half) +
-    `\n\n[... TRUNCATED: showing first and last ${half} characters of ${text.length} total ...]\n\n` +
-    text.slice(-half)
-  );
+  return text.slice(0, maxChars) + `\n\n[TRUNCATED: showing first ${maxChars} characters]`;
 }
 
 /* =========================
    ROUTES
 ========================= */
-
 app.get("/", (req, res) => {
-  res.status(200).json({
-    service: "AI Infrastructure Troubleshooting Agent",
-    version: "1.2.0",
-    status: "operational",
-    endpoints: {
-      health: "GET /healthz",
-      auth: "POST /auth/login",
-      chat: "POST /api/chat",
-      settings: "GET/PUT /api/settings",
-      scripts: "GET/POST/DELETE /api/scripts"
-    }
-  });
+  res.status(200).send("Backend running. Use GET /healthz, POST /auth/login, POST /api/chat.");
 });
 
 app.get("/healthz", (req, res) => {
-  res.status(200).json({
-    status: "ok",
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
-  });
+  res.status(200).json({ status: "ok" });
 });
 
-/* =========================
-   AUTH: LOGIN
-========================= */
+/* ---- Auth Login ---- */
 app.post("/auth/login", async (req, res) => {
   try {
     const adminUser = requireEnv("ADMIN_USERNAME");
-    const adminPassHash = requireEnv("ADMIN_PASSWORD_HASH");
+    const adminPass = requireEnv("ADMIN_PASSWORD");
 
     const { username, password } = req.body || {};
-    
     if (!username || !password) {
-      return res.status(400).json({
-        ok: false,
-        error: "Username and password are required"
-      });
+      return res.status(400).json({ ok: false, error: "Username and password are required" });
     }
 
-    // Verify username
-    const userOk = String(username).trim() === String(adminUser).trim();
-    
-    // Verify password using async compare (secure)
-    const passOk = userOk ? await bcrypt.compare(String(password), adminPassHash) : false;
+    // NOTE: This is single-admin auth. If you later add multi-user accounts,
+    // replace this with a real user store.
+    const passHash = bcrypt.hashSync(adminPass, 10);
+    const userOk = String(username) === String(adminUser);
+    const passOk = bcrypt.compareSync(String(password), passHash);
 
     if (!userOk || !passOk) {
-      // Add small delay to prevent timing attacks
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      return res.status(401).json({
-        ok: false,
-        error: "Invalid credentials"
-      });
+      return res.status(401).json({ ok: false, error: "Invalid credentials" });
     }
 
     const token = issueToken(username);
-    
-    return res.json({
-      ok: true,
-      token,
-      expiresIn: "8h"
-    });
+    return res.json({ ok: true, token });
   } catch (err) {
     console.error("Login error:", err);
-    return res.status(500).json({
-      ok: false,
-      error: "Internal server error"
-    });
+    return res.status(500).json({ ok: false, error: "Internal server error" });
   }
 });
 
-/* =========================
-   SETTINGS API
-========================= */
+/* ---- Settings (server-side) ---- */
 app.get("/api/settings", authMiddleware, async (req, res) => {
   try {
     const username = userKey(req);
-    if (!username) {
-      return res.status(401).json({ ok: false, error: "Unauthorized" });
-    }
+    if (!username) return res.status(401).json({ ok: false, error: "Unauthorized" });
 
     const all = await readJsonFile(SETTINGS_PATH);
     const userSettings = sanitizeSettings(all[username] || {});
-    
     return res.json({ ok: true, settings: userSettings });
   } catch (err) {
     console.error("GET settings error:", err);
-    return res.status(500).json({
-      ok: false,
-      error: "Failed to load settings"
-    });
+    return res.status(500).json({ ok: false, error: "Internal server error" });
   }
 });
 
 app.put("/api/settings", authMiddleware, async (req, res) => {
   try {
     const username = userKey(req);
-    if (!username) {
-      return res.status(401).json({ ok: false, error: "Unauthorized" });
-    }
+    if (!username) return res.status(401).json({ ok: false, error: "Unauthorized" });
 
     const incoming = req.body?.settings ? req.body.settings : req.body;
     const next = sanitizeSettings(incoming);
@@ -561,10 +405,7 @@ app.put("/api/settings", authMiddleware, async (req, res) => {
     return res.json({ ok: true, settings: next });
   } catch (err) {
     console.error("PUT settings error:", err);
-    return res.status(500).json({
-      ok: false,
-      error: "Failed to save settings"
-    });
+    return res.status(500).json({ ok: false, error: "Internal server error" });
   }
 });
 
@@ -574,18 +415,18 @@ app.put("/api/settings", authMiddleware, async (req, res) => {
 
 /**
  * POST /api/scripts
- * Upload a new script file
+ * multipart/form-data:
+ * - file: script file
+ * - name: optional display name
+ * - language: optional
+ * - tags: optional "a,b,c"
  */
 app.post("/api/scripts", authMiddleware, uploadScript.single("file"), async (req, res) => {
   try {
     const username = userKey(req);
-    if (!username) {
-      return res.status(401).json({ ok: false, error: "Unauthorized" });
-    }
+    if (!username) return res.status(401).json({ ok: false, error: "Unauthorized" });
 
-    if (!req.file) {
-      return res.status(400).json({ ok: false, error: "No file uploaded" });
-    }
+    if (!req.file) return res.status(400).json({ ok: false, error: "Missing file" });
 
     const originalName = String(req.file.originalname || "script.txt");
     const contentText = safeTextFromBuffer(req.file.buffer);
@@ -609,154 +450,96 @@ app.post("/api/scripts", authMiddleware, uploadScript.single("file"), async (req
     };
 
     const saved = await saveScript(username, meta, contentText);
-    
-    return res.json({
-      ok: true,
-      script: saved.meta,
-      message: "Script uploaded successfully"
-    });
+    return res.json({ ok: true, script: saved.meta });
   } catch (err) {
     console.error("Upload script error:", err);
-    return res.status(400).json({
-      ok: false,
-      error: err?.message || "Upload failed"
-    });
+    return res.status(400).json({ ok: false, error: err?.message || "Upload failed" });
   }
 });
 
 /**
  * GET /api/scripts
- * List all scripts for the authenticated user
  */
 app.get("/api/scripts", authMiddleware, async (req, res) => {
   try {
     const username = userKey(req);
-    if (!username) {
-      return res.status(401).json({ ok: false, error: "Unauthorized" });
-    }
+    if (!username) return res.status(401).json({ ok: false, error: "Unauthorized" });
 
     const scripts = await listScripts(username);
-    
-    return res.json({
-      ok: true,
-      scripts,
-      count: scripts.length
-    });
+    return res.json({ ok: true, scripts });
   } catch (err) {
     console.error("List scripts error:", err);
-    return res.status(500).json({
-      ok: false,
-      error: "Failed to list scripts"
-    });
+    return res.status(500).json({ ok: false, error: "Internal server error" });
   }
 });
 
 /**
  * GET /api/scripts/:id
- * Get a specific script by ID
  */
 app.get("/api/scripts/:id", authMiddleware, async (req, res) => {
   try {
     const username = userKey(req);
-    if (!username) {
-      return res.status(401).json({ ok: false, error: "Unauthorized" });
-    }
+    if (!username) return res.status(401).json({ ok: false, error: "Unauthorized" });
 
     const scriptId = String(req.params.id || "").trim();
-    if (!scriptId) {
-      return res.status(400).json({ ok: false, error: "Missing script ID" });
-    }
+    if (!scriptId) return res.status(400).json({ ok: false, error: "Missing script id" });
 
     const script = await getScript(username, scriptId);
-    if (!script) {
-      return res.status(404).json({ ok: false, error: "Script not found" });
-    }
+    if (!script) return res.status(404).json({ ok: false, error: "Not found" });
 
-    return res.json({
-      ok: true,
-      script: script.meta,
-      content: script.content
-    });
+    return res.json({ ok: true, script: script.meta, content: script.content });
   } catch (err) {
     console.error("Get script error:", err);
-    return res.status(500).json({
-      ok: false,
-      error: "Failed to retrieve script"
-    });
+    return res.status(500).json({ ok: false, error: "Internal server error" });
   }
 });
 
 /**
  * DELETE /api/scripts/:id
- * Delete a script by ID
  */
 app.delete("/api/scripts/:id", authMiddleware, async (req, res) => {
   try {
     const username = userKey(req);
-    if (!username) {
-      return res.status(401).json({ ok: false, error: "Unauthorized" });
-    }
+    if (!username) return res.status(401).json({ ok: false, error: "Unauthorized" });
 
     const scriptId = String(req.params.id || "").trim();
-    if (!scriptId) {
-      return res.status(400).json({ ok: false, error: "Missing script ID" });
-    }
+    if (!scriptId) return res.status(400).json({ ok: false, error: "Missing script id" });
 
-    const deleted = await deleteScript(username, scriptId);
-    if (!deleted) {
-      return res.status(404).json({ ok: false, error: "Script not found" });
-    }
+    const ok = await deleteScript(username, scriptId);
+    if (!ok) return res.status(404).json({ ok: false, error: "Not found" });
 
-    return res.json({
-      ok: true,
-      message: "Script deleted successfully"
-    });
+    return res.json({ ok: true });
   } catch (err) {
     console.error("Delete script error:", err);
-    return res.status(500).json({
-      ok: false,
-      error: "Failed to delete script"
-    });
+    return res.status(500).json({ ok: false, error: "Internal server error" });
   }
 });
 
 /* =========================
-   CHAT API (with image support)
+   CHAT (now supports selectedScriptIds)
 ========================= */
 app.post("/api/chat", authMiddleware, upload.single("image"), async (req, res) => {
   try {
     if (!process.env.OPENAI_API_KEY) {
-      return res.status(500).json({
-        ok: false,
-        error: "OpenAI API key not configured on server"
-      });
+      return res.status(500).json({ ok: false, error: "Missing OPENAI_API_KEY on server." });
     }
 
     const message = req.body?.message ? String(req.body.message) : "";
-    if (!message.trim()) {
-      return res.status(400).json({
-        ok: false,
-        error: "Message is required"
-      });
-    }
+    if (!message.trim()) return res.status(400).json({ ok: false, error: "Message is required" });
 
     const username = userKey(req);
 
-    // Parse selected script IDs
+    // Selected scripts passed from frontend
     let selectedScriptIds = [];
     try {
       const raw = req.body?.selectedScriptIds;
-      if (raw) {
-        selectedScriptIds = typeof raw === "string" ? JSON.parse(raw) : raw;
-      }
-      if (!Array.isArray(selectedScriptIds)) {
-        selectedScriptIds = [];
-      }
+      if (raw) selectedScriptIds = typeof raw === "string" ? JSON.parse(raw) : raw;
+      if (!Array.isArray(selectedScriptIds)) selectedScriptIds = [];
     } catch {
       selectedScriptIds = [];
     }
 
-    // Load selected scripts (with truncation and line numbers)
+    // Load selected scripts (truncate and add line numbers)
     const scriptBlocks = [];
     const MAX_SCRIPTS = 3;
     const MAX_CHARS_PER_SCRIPT = 6000;
@@ -764,129 +547,47 @@ app.post("/api/chat", authMiddleware, upload.single("image"), async (req, res) =
     for (const id of selectedScriptIds.slice(0, MAX_SCRIPTS)) {
       const sid = String(id || "").trim();
       if (!sid) continue;
-      
       const script = await getScript(username, sid);
       if (!script) continue;
 
       const numbered = addLineNumbers(truncateText(script.content, MAX_CHARS_PER_SCRIPT));
       scriptBlocks.push(
-        `--- SCRIPT: ${script.meta.name} (${script.meta.language}) ---\n${numbered}\n--- END SCRIPT ---`
+        `--- SCRIPT: ${script.meta.name} (language: ${script.meta.language}) ---\n${numbered}\n--- END SCRIPT ---`
       );
     }
 
-    // Parse conversation history
     const history = normalizeHistory(parseHistory(req.body?.history));
     const approvalState = approvalStateFromMessage(message);
     const system = buildSystemPrompt(approvalState);
 
-    // Handle image attachment
     const hasImage = !!req.file;
-    let userContent = message;
 
-    // Append scripts to message
-    if (scriptBlocks.length > 0) {
-      userContent += `\n\n[ATTACHED SCRIPTS]\n${scriptBlocks.join("\n\n")}`;
+    let userContent = message;
+    if (scriptBlocks.length) {
+      userContent += `\n\n[Saved Scripts Attached]\n${scriptBlocks.join("\n\n")}`;
+    }
+    if (hasImage) {
+      userContent += `\n\n[Note: User attached a screenshot image. Ask for the visible error text if needed; do not assume OCR.]`;
     }
 
-    // Build messages array
     const messages = [
       { role: "system", content: system },
-      ...history
+      ...history,
+      { role: "user", content: userContent }
     ];
 
-    // Add user message with optional image
-    if (hasImage) {
-      const base64Image = req.file.buffer.toString("base64");
-      const mimeType = req.file.mimetype || "image/jpeg";
-      
-      messages.push({
-        role: "user",
-        content: [
-          { type: "text", text: userContent },
-          {
-            type: "image_url",
-            image_url: {
-              url: `data:${mimeType};base64,${base64Image}`,
-              detail: "high"
-            }
-          }
-        ]
-      });
-    } else {
-      messages.push({
-        role: "user",
-        content: userContent
-      });
-    }
-
-    // Call OpenAI API with correct format
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Using correct model name
-      messages: messages,
-      temperature: 0.7,
-      max_tokens: 3000,
-      top_p: 0.95
+    const response = await openai.responses.create({
+      model: "gpt-4.1-mini",
+      input: messages
     });
 
-    const responseText = response.choices[0]?.message?.content || "";
-
-    if (!responseText) {
-      return res.status(500).json({
-        ok: false,
-        error: "No response generated from AI"
-      });
-    }
-
-    return res.json({
-      ok: true,
-      text: responseText,
-      model: response.model,
-      usage: {
-        prompt_tokens: response.usage?.prompt_tokens || 0,
-        completion_tokens: response.usage?.completion_tokens || 0,
-        total_tokens: response.usage?.total_tokens || 0
-      }
-    });
+    return res.json({ ok: true, text: response.output_text || "" });
   } catch (err) {
     console.error("Chat error:", err);
-    
-    // Provide specific error messages
-    let errorMessage = "Internal server error";
-    if (err.response?.status === 401) {
-      errorMessage = "OpenAI API authentication failed";
-    } else if (err.response?.status === 429) {
-      errorMessage = "Rate limit exceeded. Please try again later.";
-    } else if (err.message) {
-      errorMessage = err.message;
-    }
-    
-    return res.status(500).json({
-      ok: false,
-      error: errorMessage
-    });
+    return res.status(500).json({ ok: false, error: err?.message || "Internal server error" });
   }
 });
 
-/* =========================
-   ERROR HANDLING
-========================= */
-app.use((err, req, res, next) => {
-  console.error("Unhandled error:", err);
-  res.status(500).json({
-    ok: false,
-    error: err.message || "Internal server error"
-  });
-});
-
-/* =========================
-   SERVER START
-========================= */
 app.listen(PORT, () => {
-  console.log(`
-╔════════════════════════════════════════════════════════════╗
-║  AI Infrastructure Troubleshooting Agent                   ║
-║  Server: http://localhost:${PORT}                          ║
-║  Status: Ready                                             ║
-╚════════════════════════════════════════════════════════════╝
-  `);
+  console.log(`Server listening on ${PORT}`);
 });
