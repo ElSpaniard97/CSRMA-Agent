@@ -10,7 +10,7 @@
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>" />
   
-  <link rel="stylesheet" href="./main.css?v=4" />
+  <link rel="stylesheet" href="./main.css?v=5" />
 </head>
 
 <body>
@@ -56,107 +56,153 @@
   </div>
 
   <!-- MAIN APPLICATION (hidden until authenticated) -->
-  <main id="appShell" class="container hidden">
-    <!-- Header -->
-    <header class="header">
-      <div class="brand">
-        <div class="logo" aria-label="AI Agent Logo">AI</div>
-        <div>
-          <h1>Infrastructure Troubleshooting</h1>
-          <p>Diagnostics-first. Approval-gated remediation. Paste logs/scripts or upload screenshots.</p>
+  <div id="appShell" class="appLayout hidden">
+    <!-- COLLAPSIBLE SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebarHeader">
+        <div class="brand">
+          <div class="logo" aria-label="AI Agent Logo">AI</div>
+          <div>
+            <h1>Infrastructure Troubleshooting</h1>
+          </div>
+        </div>
+        <button class="sidebarToggle" id="sidebarToggle" aria-label="Toggle sidebar">
+          <span class="toggleIcon">◀</span>
+        </button>
+      </div>
+
+      <div class="sidebarContent">
+        <!-- Mode Indicator -->
+        <div class="sidebarSection">
+          <div class="sectionLabel">Current Mode</div>
+          <span class="pill modePill" id="modePill" role="status">Mode: Diagnostics</span>
+        </div>
+
+        <!-- Remediation Toggle -->
+        <div class="sidebarSection">
+          <div class="sectionLabel">Approval</div>
+          <label class="toggle" title="Enable only if you approve production-impacting remediation">
+            <input type="checkbox" id="approveToggle" aria-label="Remediation approval toggle" />
+            <span class="toggleUi" aria-hidden="true"></span>
+            <span class="toggleText">Remediation approved</span>
+          </label>
+        </div>
+
+        <!-- Actions -->
+        <div class="sidebarSection">
+          <div class="sectionLabel">Actions</div>
+          <div class="sidebarButtons">
+            <button class="btn secondary fullWidth" type="button" id="clearChatBtn" title="Clear conversation history">
+              🗑️ Clear Chat
+            </button>
+            <button class="btn secondary fullWidth" type="button" id="scriptsBtn" title="Upload and manage saved scripts">
+              📄 Scripts
+            </button>
+            <button class="btn secondary fullWidth" type="button" id="settingsBtn" title="Configure application settings">
+              ⚙️ Settings
+            </button>
+          </div>
+        </div>
+
+        <!-- Export Options -->
+        <div class="sidebarSection">
+          <div class="sectionLabel">Export</div>
+          <div class="sidebarButtons">
+            <button class="btn secondary fullWidth" type="button" id="copyTicketBtn" title="Copy last response as ticket notes">
+              📋 Copy Notes
+            </button>
+            <button class="btn secondary fullWidth" type="button" id="exportTxtBtn" title="Export conversation as text file">
+              📝 Export TXT
+            </button>
+            <button class="btn secondary fullWidth" type="button" id="exportJsonBtn" title="Export conversation as JSON">
+              💾 Export JSON
+            </button>
+          </div>
+        </div>
+
+        <!-- Logout -->
+        <div class="sidebarSection">
+          <button class="btn secondary fullWidth logout" type="button" id="logoutBtn" title="Sign out">
+            🚪 Logout
+          </button>
         </div>
       </div>
-    </header>
+    </aside>
 
-    <!-- Control Bar -->
-    <section class="card controls" aria-label="Mode and actions">
-      <div class="left">
-        <span class="pill" id="modePill" role="status">Mode: Diagnostics</span>
+    <!-- MAIN CONTENT AREA -->
+    <main class="mainContent">
+      <!-- Top Bar with Presets -->
+      <header class="topBar">
+        <div class="topBarLeft">
+          <button class="mobileMenuBtn" id="mobileMenuBtn" aria-label="Open menu">
+            ☰
+          </button>
+          <p class="tagline">Diagnostics-first. Approval-gated remediation. Paste logs/scripts or upload screenshots.</p>
+        </div>
+        <div class="presets" aria-label="Preset intake templates">
+          <span class="presetsLabel">Quick Templates:</span>
+          <button class="chip" type="button" data-preset="network" title="Network troubleshooting template">
+            🌐 Network
+          </button>
+          <button class="chip" type="button" data-preset="server" title="Server troubleshooting template">
+            🖥️ Server
+          </button>
+          <button class="chip" type="button" data-preset="script" title="Script debugging template">
+            📜 Script
+          </button>
+          <button class="chip" type="button" data-preset="hardware" title="Hardware diagnostics template">
+            🔧 Hardware
+          </button>
+        </div>
+      </header>
 
-        <label class="toggle" title="Enable only if you approve production-impacting remediation">
-          <input type="checkbox" id="approveToggle" aria-label="Remediation approval toggle" />
-          <span class="toggleUi" aria-hidden="true"></span>
-          <span class="toggleText">Remediation approved</span>
-        </label>
+      <!-- Chat Area -->
+      <section class="chatSection">
+        <div 
+          class="chat" 
+          id="chat" 
+          role="log" 
+          aria-label="Chat transcript" 
+          aria-live="polite"
+        ></div>
+      </section>
 
-        <button class="btn secondary" type="button" id="logoutBtn" title="Sign out">Logout</button>
-      </div>
+      <!-- Message Composer -->
+      <section class="composerSection">
+        <form class="composer" id="form">
+          <label class="fileBtn" title="Attach a screenshot (optional, supports image analysis)">
+            <input 
+              type="file" 
+              id="image" 
+              accept="image/*" 
+              aria-label="Attach screenshot"
+            />
+            📎 Screenshot
+          </label>
 
-      <div class="right">
-        <button class="btn secondary" type="button" id="copyTicketBtn" title="Copy last response as ticket notes">
-          Copy Ticket Notes
-        </button>
-        <button class="btn secondary" type="button" id="exportTxtBtn" title="Export conversation as text file">
-          Export TXT
-        </button>
-        <button class="btn secondary" type="button" id="exportJsonBtn" title="Export conversation as JSON">
-          Export JSON
-        </button>
-      </div>
-    </section>
+          <textarea
+            id="message"
+            class="input messageInput"
+            rows="3"
+            placeholder="Describe the issue or paste logs/errors/scripts... (Ctrl/Cmd + Enter to send)"
+            required
+            aria-label="Message input"
+          ></textarea>
 
-    <!-- Preset Templates -->
-    <section class="card presets" aria-label="Preset intake templates">
-      <button class="chip" type="button" data-preset="network" title="Network troubleshooting template">
-        Network
-      </button>
-      <button class="chip" type="button" data-preset="server" title="Server troubleshooting template">
-        Server
-      </button>
-      <button class="chip" type="button" data-preset="script" title="Script debugging template">
-        Script
-      </button>
-      <button class="chip" type="button" data-preset="hardware" title="Hardware diagnostics template">
-        Hardware
-      </button>
-      <span class="hint">Use a preset to generate a structured intake template.</span>
-    </section>
+          <button class="btn primary sendBtn" type="submit" id="sendBtn">
+            Send →
+          </button>
+        </form>
 
-    <!-- Chat Area -->
-    <section class="card chatWrap" aria-label="Chat">
-      <div 
-        class="chat" 
-        id="chat" 
-        role="log" 
-        aria-label="Chat transcript" 
-        aria-live="polite"
-      ></div>
-    </section>
-
-    <!-- Message Composer -->
-    <section class="card composerWrap" aria-label="Message input">
-      <form class="composer" id="form">
-        <label class="fileBtn" title="Attach a screenshot (optional, supports image analysis)">
-          <input 
-            type="file" 
-            id="image" 
-            accept="image/*" 
-            aria-label="Attach screenshot"
-          />
-          📎 Attach screenshot
-        </label>
-
-        <textarea
-          id="message"
-          class="input"
-          rows="3"
-          placeholder="Describe the issue or paste logs/errors/scripts... (Ctrl/Cmd + Enter to send)"
-          required
-          aria-label="Message input"
-        ></textarea>
-
-        <button class="btn primary" type="submit" id="sendBtn">Send</button>
-      </form>
-
-      <div class="footnote">
-        Do not paste secrets (keys/passwords). Outputs are designed to be ticket-safe.
-        <strong>Tip:</strong> Use Ctrl/Cmd + Enter to send quickly.
-      </div>
-    </section>
+        <div class="footnote">
+          💡 <strong>Tip:</strong> Use Ctrl/Cmd + Enter to send quickly. Do not paste secrets (keys/passwords).
+        </div>
+      </section>
+    </main>
 
     <!-- Toast Notifications -->
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  </main>
+  </div>
 
   <!-- Configuration -->
   <script>
@@ -170,6 +216,6 @@
   </script>
 
   <!-- Application Script -->
-  <script src="./app.js?v=4"></script>
+  <script src="./app.js?v=5"></script>
 </body>
 </html>
