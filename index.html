@@ -93,13 +93,13 @@
           <div class="sectionLabel">Actions</div>
           <div class="sidebarButtons">
             <button class="btn secondary fullWidth" type="button" id="clearChatBtn" title="Clear conversation history">
-              🗑️ Clear Chat
+              Clear Chat
             </button>
             <button class="btn secondary fullWidth" type="button" id="scriptsBtn" title="Upload and manage saved scripts">
-              📄 Scripts
+              Scripts
             </button>
             <button class="btn secondary fullWidth" type="button" id="settingsBtn" title="Configure application settings">
-              ⚙️ Settings
+              Settings
             </button>
           </div>
         </div>
@@ -109,13 +109,13 @@
           <div class="sectionLabel">Export</div>
           <div class="sidebarButtons">
             <button class="btn secondary fullWidth" type="button" id="copyTicketBtn" title="Copy last response as ticket notes">
-              📋 Copy Notes
+              Copy Notes
             </button>
             <button class="btn secondary fullWidth" type="button" id="exportTxtBtn" title="Export conversation as text file">
-              📝 Export TXT
+              Export TXT
             </button>
             <button class="btn secondary fullWidth" type="button" id="exportJsonBtn" title="Export conversation as JSON">
-              💾 Export JSON
+              Export JSON
             </button>
           </div>
         </div>
@@ -123,11 +123,16 @@
         <!-- Logout -->
         <div class="sidebarSection">
           <button class="btn secondary fullWidth logout" type="button" id="logoutBtn" title="Sign out">
-            🚪 Logout
+            Logout
           </button>
         </div>
       </div>
     </aside>
+
+    <!-- Floating Toggle Button (appears when sidebar collapsed) -->
+    <button class="sidebarFloatingToggle" id="sidebarFloatingToggle" aria-label="Open sidebar">
+      ☰
+    </button>
 
     <!-- MAIN CONTENT AREA -->
     <main class="mainContent">
@@ -142,16 +147,16 @@
         <div class="presets" aria-label="Preset intake templates">
           <span class="presetsLabel">Quick Templates:</span>
           <button class="chip" type="button" data-preset="network" title="Network troubleshooting template">
-            🌐 Network
+            Network
           </button>
           <button class="chip" type="button" data-preset="server" title="Server troubleshooting template">
-            🖥️ Server
+            Server
           </button>
           <button class="chip" type="button" data-preset="script" title="Script debugging template">
-            📜 Script
+            Script
           </button>
           <button class="chip" type="button" data-preset="hardware" title="Hardware diagnostics template">
-            🔧 Hardware
+            Hardware
           </button>
         </div>
       </header>
@@ -177,7 +182,7 @@
               accept="image/*" 
               aria-label="Attach screenshot"
             />
-            📎 Screenshot
+            Screenshot
           </label>
 
           <textarea
@@ -190,12 +195,12 @@
           ></textarea>
 
           <button class="btn primary sendBtn" type="submit" id="sendBtn">
-            Send →
+            Send
           </button>
         </form>
 
         <div class="footnote">
-          💡 <strong>Tip:</strong> Use Ctrl/Cmd + Enter to send quickly. Do not paste secrets (keys/passwords).
+          Do not paste secrets (keys/passwords). Use Ctrl/Cmd + Enter to send.
         </div>
       </section>
     </main>
