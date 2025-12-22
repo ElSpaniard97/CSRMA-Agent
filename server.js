@@ -50,14 +50,14 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
    CORS CONFIGURATION
 ========================= */
 const ALLOWED_ORIGINS = new Set([
-  const ALLOWED_ORIGINS = new Set([
-     "https://elspaniard97.github.io",
-     "http://localhost:5500",
-     "http://localhost:3000",
-     "http://localhost:8080",
-     "http://127.0.0.1:5500",
-     "http://127.0.0.1:3000",
-     "http://127.0.0.1:8080"
+  "https://elspaniard97.github.io",
+  "https://8fc1948.github.io",
+  "http://localhost:5500",
+  "http://localhost:3000",
+  "http://localhost:8080",
+  "http://127.0.0.1:5500",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:8080"
 ]);
 
 app.use(
