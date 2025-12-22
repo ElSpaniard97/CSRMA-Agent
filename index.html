@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Infrastructure Troubleshooting Agent</title>
+  <meta name="description" content="Diagnostics-first AI troubleshooting tool for networking, servers, scripts, and hardware. Restricted access - Login required." />
+  <meta name="robots" content="noindex, nofollow" />
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>" />
+  
+  <link rel="stylesheet" href="./main.css?v=4" />
+</head>
+
+<body>
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen" class="centerPage">
+    <div class="loginShell">
+      <div class="card">
+        <div class="brand" style="margin-bottom:10px;">
+          <div class="logo" aria-label="AI Agent Logo">AI</div>
+          <div>
+            <h1 style="margin:0;">Sign in</h1>
+            <p style="margin:6px 0 0;">Access is restricted. Authenticate to use the troubleshooting agent.</p>
+          </div>
+        </div>
+
+        <form id="loginForm" style="display:grid; gap:10px; margin-top:14px;">
+          <input
+            id="loginUser"
+            class="input"
+            placeholder="Username"
+            autocomplete="username"
+            required
+            aria-label="Username"
+          />
+          <input
+            id="loginPass"
+            class="input"
+            placeholder="Password"
+            type="password"
+            autocomplete="current-password"
+            required
+            aria-label="Password"
+          />
+          <button class="btn primary" type="submit">Login</button>
+          <div class="footnote" id="authStatus" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="footnote" style="margin-top:10px; text-align:center;">
+        Do not paste secrets. Authentication is enforced by the backend.
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APPLICATION (hidden until authenticated) -->
+  <main id="appShell" class="container hidden">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo" aria-label="AI Agent Logo">AI</div>
+        <div>
+          <h1>Infrastructure Troubleshooting</h1>
+          <p>Diagnostics-first. Approval-gated remediation. Paste logs/scripts or upload screenshots.</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Control Bar -->
+    <section class="card controls" aria-label="Mode and actions">
+      <div class="left">
+        <span class="pill" id="modePill" role="status">Mode: Diagnostics</span>
+
+        <label class="toggle" title="Enable only if you approve production-impacting remediation">
+          <input type="checkbox" id="approveToggle" aria-label="Remediation approval toggle" />
+          <span class="toggleUi" aria-hidden="true"></span>
+          <span class="toggleText">Remediation approved</span>
+        </label>
+
+        <button class="btn secondary" type="button" id="logoutBtn" title="Sign out">Logout</button>
+      </div>
+
+      <div class="right">
+        <button class="btn secondary" type="button" id="copyTicketBtn" title="Copy last response as ticket notes">
+          Copy Ticket Notes
+        </button>
+        <button class="btn secondary" type="button" id="exportTxtBtn" title="Export conversation as text file">
+          Export TXT
+        </button>
+        <button class="btn secondary" type="button" id="exportJsonBtn" title="Export conversation as JSON">
+          Export JSON
+        </button>
+      </div>
+    </section>
+
+    <!-- Preset Templates -->
+    <section class="card presets" aria-label="Preset intake templates">
+      <button class="chip" type="button" data-preset="network" title="Network troubleshooting template">
+        Network
+      </button>
+      <button class="chip" type="button" data-preset="server" title="Server troubleshooting template">
+        Server
+      </button>
+      <button class="chip" type="button" data-preset="script" title="Script debugging template">
+        Script
+      </button>
+      <button class="chip" type="button" data-preset="hardware" title="Hardware diagnostics template">
+        Hardware
+      </button>
+      <span class="hint">Use a preset to generate a structured intake template.</span>
+    </section>
+
+    <!-- Chat Area -->
+    <section class="card chatWrap" aria-label="Chat">
+      <div 
+        class="chat" 
+        id="chat" 
+        role="log" 
+        aria-label="Chat transcript" 
+        aria-live="polite"
+      ></div>
+    </section>
+
+    <!-- Message Composer -->
+    <section class="card composerWrap" aria-label="Message input">
+      <form class="composer" id="form">
+        <label class="fileBtn" title="Attach a screenshot (optional, supports image analysis)">
+          <input 
+            type="file" 
+            id="image" 
+            accept="image/*" 
+            aria-label="Attach screenshot"
+          />
+          📎 Attach screenshot
+        </label>
+
+        <textarea
+          id="message"
+          class="input"
+          rows="3"
+          placeholder="Describe the issue or paste logs/errors/scripts... (Ctrl/Cmd + Enter to send)"
+          required
+          aria-label="Message input"
+        ></textarea>
+
+        <button class="btn primary" type="submit" id="sendBtn">Send</button>
+      </form>
+
+      <div class="footnote">
+        Do not paste secrets (keys/passwords). Outputs are designed to be ticket-safe.
+        <strong>Tip:</strong> Use Ctrl/Cmd + Enter to send quickly.
+      </div>
+    </section>
+
+    <!-- Toast Notifications -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <!-- Configuration -->
+  <script>
+    // Backend configuration
+    // For local development, update these URLs:
+    // window.BACKEND_URL = "http://localhost:10000/api/chat";
+    // window.LOGIN_URL = "http://localhost:10000/auth/login";
+    
+    window.BACKEND_URL = "https://imbedded-csrma-ai-agent.onrender.com/api/chat";
+    window.LOGIN_URL = "https://imbedded-csrma-ai-agent.onrender.com/auth/login";
+  </script>
+
+  <!-- Application Script -->
+  <script src="./app.js?v=4"></script>
+</body>
+</html>
