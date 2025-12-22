@@ -1265,11 +1265,49 @@ messageEl?.addEventListener("keydown", (e) => {
 });
 
 /* =========================
+   SIDEBAR TOGGLE
+========================= */
+function setupSidebarToggle() {
+  const sidebar = document.querySelector('.sidebar');
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+
+  // Desktop toggle
+  sidebarToggle?.addEventListener('click', () => {
+    sidebar?.classList.toggle('collapsed');
+    localStorage.setItem('sidebarCollapsed', sidebar?.classList.contains('collapsed'));
+  });
+
+  // Mobile toggle
+  mobileMenuBtn?.addEventListener('click', () => {
+    sidebar?.classList.toggle('open');
+  });
+
+  // Close sidebar when clicking outside on mobile
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 768) {
+      if (sidebar?.classList.contains('open') && 
+          !sidebar.contains(e.target) && 
+          e.target !== mobileMenuBtn) {
+        sidebar.classList.remove('open');
+      }
+    }
+  });
+
+  // Restore sidebar state
+  const wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+  if (wasCollapsed) {
+    sidebar?.classList.add('collapsed');
+  }
+}
+
+/* =========================
    INITIALIZATION
 ========================= */
 setModePill();
 setAuthUI();
 ensureUtilityButtons();
 applySettingsToUI(loadCachedSettings());
+setupSidebarToggle();
 
 console.log(`${APP_NAME} v1.2.0 initialized`);
