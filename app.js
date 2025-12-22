@@ -4,7 +4,6 @@ const TOKEN_KEY = "ai_agent_token";
 const SETTINGS_CACHE_KEY = "ai_agent_settings_cache_v2";
 const SELECTED_SCRIPTS_KEY = "ai_agent_selected_scripts_v1";
 
-// DOM elements
 const loginScreen = document.getElementById("loginScreen");
 const appShell = document.getElementById("appShell");
 
@@ -18,7 +17,6 @@ const chatEl = document.getElementById("chat");
 const form = document.getElementById("form");
 const messageEl = document.getElementById("message");
 const imageEl = document.getElementById("image");
-const sendBtn = document.getElementById("sendBtn");
 
 const approveToggle = document.getElementById("approveToggle");
 const modePill = document.getElementById("modePill");
@@ -31,26 +29,19 @@ const toastEl = document.getElementById("toast");
 
 const history = [];
 
-/* =========================
-   UTILITY FUNCTIONS
-========================= */
-function toast(msg, duration = 2500) {
+function toast(msg) {
   if (!toastEl) return;
   toastEl.textContent = msg;
   toastEl.classList.add("show");
-  setTimeout(() => toastEl.classList.remove("show"), duration);
+  setTimeout(() => toastEl.classList.remove("show"), 1800);
 }
 
 function getToken() {
   return localStorage.getItem(TOKEN_KEY) || "";
 }
-
 function setToken(token) {
-  if (!token) {
-    localStorage.removeItem(TOKEN_KEY);
-  } else {
-    localStorage.setItem(TOKEN_KEY, token);
-  }
+  if (!token) localStorage.removeItem(TOKEN_KEY);
+  else localStorage.setItem(TOKEN_KEY, token);
 }
 
 function backendBaseUrl() {
@@ -59,7 +50,7 @@ function backendBaseUrl() {
 }
 
 /* =========================
-   SETTINGS MANAGEMENT
+   Theme + Settings (server-side settings supported)
 ========================= */
 function defaultSettings() {
   return {
@@ -70,7 +61,6 @@ function defaultSettings() {
     theme: "system"
   };
 }
-
 function loadCachedSettings() {
   try {
     const raw = localStorage.getItem(SETTINGS_CACHE_KEY);
@@ -80,7 +70,6 @@ function loadCachedSettings() {
     return defaultSettings();
   }
 }
-
 function cacheSettings(s) {
   localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(s));
 }
@@ -131,7 +120,6 @@ async function apiSaveSettings(settings) {
 function isApproved() {
   return !!approveToggle?.checked;
 }
-
 function setModePill() {
   if (!modePill) return;
   if (isApproved()) {
@@ -147,17 +135,11 @@ function applySettingsToUI(s) {
   applyTheme(s.theme);
   if (approveToggle) approveToggle.checked = !!s.defaultApproval;
   setModePill();
-  if (s.defaultPreset) {
-    presetFill(s.defaultPreset, { 
-      focus: false, 
-      expand: !!s.expandOnPreset, 
-      silent: true 
-    });
-  }
+  if (s.defaultPreset) presetFill(s.defaultPreset, { focus: false, expand: !!s.expandOnPreset, silent: true });
 }
 
 /* =========================
-   SELECTED SCRIPTS (local storage)
+   Selected scripts (persist locally)
 ========================= */
 function getSelectedScriptIds() {
   try {
@@ -168,169 +150,60 @@ function getSelectedScriptIds() {
     return [];
   }
 }
-
 function setSelectedScriptIds(ids) {
-  const clean = Array.isArray(ids) 
-    ? ids.map(String).filter(Boolean).slice(0, 3) 
-    : [];
+  const clean = Array.isArray(ids) ? ids.map(String).filter(Boolean).slice(0, 3) : [];
   localStorage.setItem(SELECTED_SCRIPTS_KEY, JSON.stringify(clean));
   return clean;
 }
 
 /* =========================
-   MODAL STYLES INJECTION
+   Inject minimal modal styles (so you donâ€™t have to edit CSS)
 ========================= */
 function injectModalCssOnce() {
   if (document.getElementById("scriptModalCss")) return;
-  
   const style = document.createElement("style");
   style.id = "scriptModalCss";
   style.textContent = `
-    .modal.hidden { display: none !important; }
-    .modal { 
-      position: fixed; 
-      inset: 0; 
-      display: grid; 
-      place-items: center; 
-      z-index: 60; 
-    }
-    .modalBackdrop { 
-      position: absolute; 
-      inset: 0; 
-      background: rgba(0,0,0,.65); 
-      backdrop-filter: blur(2px);
-    }
-    .modalCard { 
-      position: relative; 
-      width: min(860px, 92vw); 
-      max-height: 86vh; 
-      overflow: auto;
-      border-radius: 16px; 
-      padding: 14px; 
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(20,28,48,.95); 
-      backdrop-filter: blur(12px);
-      box-shadow: 0 20px 60px rgba(0,0,0,.5);
-    }
-    html[data-theme="light"] .modalCard { 
-      background: rgba(255,255,255,.96); 
-      color: rgba(10,20,40,.92); 
-      border: 1px solid rgba(10,20,40,.12); 
-    }
-    .modalHeader { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: flex-start; 
-      gap: 12px; 
-      padding-bottom: 10px; 
-      border-bottom: 1px solid rgba(255,255,255,.10); 
-    }
-    html[data-theme="light"] .modalHeader { 
-      border-bottom: 1px solid rgba(10,20,40,.10); 
-    }
-    .modalTitle { 
-      font-weight: 900; 
-      font-size: 16px; 
-    }
-    .modalSubtitle { 
-      opacity: .75; 
-      font-size: 12px; 
-      margin-top: 4px; 
-    }
-    .modalBody { 
-      padding-top: 12px; 
-      display: grid; 
-      gap: 12px; 
-    }
-    .field { 
-      display: grid; 
-      gap: 6px; 
-    }
-    .fieldLabel { 
-      font-size: 12px; 
-      opacity: .75; 
-      font-weight: 800; 
-    }
-    .row2 { 
-      display: grid; 
-      gap: 10px; 
-      grid-template-columns: 1fr 1fr; 
-    }
-    @media (max-width: 740px) { 
-      .row2 { 
-        grid-template-columns: 1fr; 
-      } 
-    }
-    .scriptList { 
-      display: grid; 
-      gap: 10px; 
-    }
-    .scriptItem { 
-      display: flex; 
-      justify-content: space-between; 
-      gap: 10px; 
-      align-items: center;
-      padding: 10px; 
-      border-radius: 12px; 
-      border: 1px solid rgba(255,255,255,.12); 
-      background: rgba(0,0,0,.12);
-      transition: background 0.2s ease;
-    }
-    .scriptItem:hover {
-      background: rgba(0,0,0,.18);
-    }
-    html[data-theme="light"] .scriptItem { 
-      border: 1px solid rgba(10,20,40,.12); 
-      background: rgba(10,20,40,.04); 
-    }
-    html[data-theme="light"] .scriptItem:hover { 
-      background: rgba(10,20,40,.08); 
-    }
-    .scriptMeta { 
-      display: grid; 
-      gap: 2px; 
-      flex: 1;
-    }
-    .scriptName { 
-      font-weight: 900; 
-    }
-    .scriptSub { 
-      font-size: 12px; 
-      opacity: .78; 
-    }
-    .scriptActions { 
-      display: flex; 
-      gap: 8px; 
-      align-items: center; 
-      flex-wrap: wrap; 
-    }
-    .badge { 
-      font-size: 11px; 
-      padding: 4px 8px; 
-      border-radius: 999px; 
-      border: 1px solid rgba(255,255,255,.14); 
-      opacity: .9; 
-      font-weight: 700;
-    }
-    html[data-theme="light"] .badge { 
-      border: 1px solid rgba(10,20,40,.14); 
-    }
+    .modal.hidden{display:none!important}
+    .modal{position:fixed;inset:0;display:grid;place-items:center;z-index:60}
+    .modalBackdrop{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+    .modalCard{position:relative;width:min(860px,92vw);max-height:86vh;overflow:auto;
+      border-radius:16px;padding:14px;border:1px solid rgba(255,255,255,.12);
+      background:rgba(20,28,48,.92);backdrop-filter: blur(10px)}
+    html[data-theme="light"] .modalCard{background:rgba(255,255,255,.94);color:rgba(10,20,40,.92);border:1px solid rgba(10,20,40,.12)}
+    .modalHeader{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.10)}
+    html[data-theme="light"] .modalHeader{border-bottom:1px solid rgba(10,20,40,.10)}
+    .modalTitle{font-weight:900;font-size:16px}
+    .modalSubtitle{opacity:.75;font-size:12px;margin-top:4px}
+    .modalBody{padding-top:12px;display:grid;gap:12px}
+    .field{display:grid;gap:6px}
+    .fieldLabel{font-size:12px;opacity:.75;font-weight:800}
+    .row2{display:grid;gap:10px;grid-template-columns: 1fr 1fr}
+    @media (max-width: 740px){.row2{grid-template-columns:1fr}}
+    .scriptList{display:grid;gap:10px}
+    .scriptItem{display:flex;justify-content:space-between;gap:10px;align-items:center;
+      padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.12)}
+    html[data-theme="light"] .scriptItem{border:1px solid rgba(10,20,40,.12);background:rgba(10,20,40,.04)}
+    .scriptMeta{display:grid;gap:2px}
+    .scriptName{font-weight:900}
+    .scriptSub{font-size:12px;opacity:.78}
+    .scriptActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .badge{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.14);opacity:.9}
+    html[data-theme="light"] .badge{border:1px solid rgba(10,20,40,.14)}
   `;
   document.head.appendChild(style);
 }
 
 /* =========================
-   SCRIPT API CALLS
+   Scripts API
 ========================= */
 async function apiListScripts() {
   const base = backendBaseUrl();
   const token = getToken();
-  
   const resp = await fetch(`${base}/api/scripts`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` }
   });
-  
   const data = await resp.json().catch(() => ({}));
   if (resp.status === 401) throw new Error("unauthorized");
   if (!resp.ok || !data.ok) throw new Error(data.error || "Failed to list scripts");
@@ -375,45 +248,40 @@ async function apiDeleteScript(id) {
 }
 
 /* =========================
-   UTILITY BUTTONS & MODALS
+   Utility buttons + Modals
 ========================= */
 function ensureUtilityButtons() {
   const controlsLeft = document.querySelector(".controls .left");
   const controlsRight = document.querySelector(".controls .right");
   if (!controlsLeft || !controlsRight) return;
 
-  // Clear button
   if (!document.getElementById("clearChatBtn")) {
     const clearBtn = document.createElement("button");
     clearBtn.id = "clearChatBtn";
     clearBtn.type = "button";
     clearBtn.className = "btn secondary";
     clearBtn.textContent = "Clear";
-    clearBtn.title = "Clear conversation history";
     clearBtn.addEventListener("click", () => clearConversation(true));
     controlsRight.prepend(clearBtn);
   }
 
-  // Scripts button
   if (!document.getElementById("scriptsBtn")) {
     const scriptsBtn = document.createElement("button");
     scriptsBtn.id = "scriptsBtn";
     scriptsBtn.type = "button";
     scriptsBtn.className = "btn secondary";
     scriptsBtn.textContent = "Scripts";
-    scriptsBtn.title = "Upload and manage saved scripts";
+    scriptsBtn.title = "Upload/select saved scripts to reference during troubleshooting";
     scriptsBtn.addEventListener("click", () => openScriptsModal());
     controlsLeft.appendChild(scriptsBtn);
   }
 
-  // Settings button
   if (!document.getElementById("settingsBtn")) {
     const settingsBtn = document.createElement("button");
     settingsBtn.id = "settingsBtn";
     settingsBtn.type = "button";
     settingsBtn.className = "btn secondary";
     settingsBtn.textContent = "Settings";
-    settingsBtn.title = "Configure application settings";
     settingsBtn.addEventListener("click", () => openSettingsModal());
     controlsLeft.appendChild(settingsBtn);
   }
@@ -423,9 +291,6 @@ function ensureUtilityButtons() {
   ensureScriptsModal();
 }
 
-/* =========================
-   SETTINGS MODAL
-========================= */
 function ensureSettingsModal() {
   if (document.getElementById("settingsModal")) return;
 
@@ -447,14 +312,14 @@ function ensureSettingsModal() {
         <label class="field">
           <span class="fieldLabel">Theme</span>
           <select class="input" id="settingTheme">
-            <option value="system">System (Auto)</option>
+            <option value="system">System</option>
             <option value="dark">Dark</option>
             <option value="light">Light</option>
           </select>
         </label>
 
         <label class="field">
-          <span class="fieldLabel">Default preset template</span>
+          <span class="fieldLabel">Default preset</span>
           <select class="input" id="settingDefaultPreset">
             <option value="">None</option>
             <option value="network">Network</option>
@@ -465,7 +330,7 @@ function ensureSettingsModal() {
         </label>
 
         <label class="field">
-          <span class="fieldLabel">Auto-expand message box on preset</span>
+          <span class="fieldLabel">Auto-expand on preset</span>
           <select class="input" id="settingExpandOnPreset">
             <option value="true">Enabled</option>
             <option value="false">Disabled</option>
@@ -473,16 +338,16 @@ function ensureSettingsModal() {
         </label>
 
         <label class="field">
-          <span class="fieldLabel">Default remediation toggle state</span>
+          <span class="fieldLabel">Default remediation toggle</span>
           <select class="input" id="settingDefaultApproval">
-            <option value="false">OFF (Diagnostics only)</option>
-            <option value="true">ON (Remediation approved)</option>
+            <option value="false">OFF</option>
+            <option value="true">ON</option>
           </select>
         </label>
 
         <div style="display:flex; justify-content:flex-end; gap:10px; padding-top:8px;">
-          <button class="btn secondary" type="button" id="resetSettingsBtn">Reset to Defaults</button>
-          <button class="btn primary" type="button" id="saveSettingsBtn">Save Settings</button>
+          <button class="btn secondary" type="button" id="resetSettingsBtn">Reset</button>
+          <button class="btn primary" type="button" id="saveSettingsBtn">Save</button>
         </div>
       </div>
     </div>
@@ -490,9 +355,8 @@ function ensureSettingsModal() {
   document.body.appendChild(modal);
 
   modal.addEventListener("click", (e) => {
-    if (e.target?.getAttribute?.("data-close") === "1") {
-      closeSettingsModal();
-    }
+    const t = e.target;
+    if (t?.getAttribute?.("data-close") === "1") closeSettingsModal();
   });
 
   wireSettingsModalButtons();
@@ -510,7 +374,6 @@ function openSettingsModal() {
 
   modal.classList.remove("hidden");
 }
-
 function closeSettingsModal() {
   const modal = document.getElementById("settingsModal");
   if (modal) modal.classList.add("hidden");
@@ -524,36 +387,28 @@ function wireSettingsModalButtons() {
     saveBtn.dataset.bound = "1";
     saveBtn.addEventListener("click", async () => {
       try {
-        saveBtn.disabled = true;
-        saveBtn.textContent = "Saving...";
-        
         const next = {
           theme: document.getElementById("settingTheme").value,
           defaultPreset: document.getElementById("settingDefaultPreset").value,
           expandOnPreset: document.getElementById("settingExpandOnPreset").value === "true",
           defaultApproval: document.getElementById("settingDefaultApproval").value === "true",
-          rememberApproval: true
+          rememberApproval: true // reserved for later; keeping true by default
         };
 
-        // Optimistic update
+        // optimistic apply
         cacheSettings({ ...defaultSettings(), ...next });
         applySettingsToUI(loadCachedSettings());
 
-        // Persist to server
+        // persist server-side
         const saved = await apiSaveSettings(next);
         cacheSettings({ ...defaultSettings(), ...saved });
         applySettingsToUI(loadCachedSettings());
 
         closeSettingsModal();
-        toast("Settings saved successfully");
+        toast("Settings saved.");
       } catch (err) {
-        if (String(err?.message) === "unauthorized") {
-          return forceLogout("Session expired. Please sign in again.");
-        }
-        toast(err?.message || "Failed to save settings", 3000);
-      } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Save Settings";
+        if (String(err?.message) === "unauthorized") return forceLogout("Session expired. Please sign in again.");
+        toast(err?.message || "Failed to save settings");
       }
     });
   }
@@ -562,9 +417,6 @@ function wireSettingsModalButtons() {
     resetBtn.dataset.bound = "1";
     resetBtn.addEventListener("click", async () => {
       try {
-        resetBtn.disabled = true;
-        resetBtn.textContent = "Resetting...";
-        
         const reset = defaultSettings();
         cacheSettings(reset);
         applySettingsToUI(reset);
@@ -574,22 +426,17 @@ function wireSettingsModalButtons() {
         applySettingsToUI(loadCachedSettings());
 
         closeSettingsModal();
-        toast("Settings reset to defaults");
+        toast("Settings reset.");
       } catch (err) {
-        if (String(err?.message) === "unauthorized") {
-          return forceLogout("Session expired. Please sign in again.");
-        }
-        toast(err?.message || "Failed to reset settings", 3000);
-      } finally {
-        resetBtn.disabled = false;
-        resetBtn.textContent = "Reset to Defaults";
+        if (String(err?.message) === "unauthorized") return forceLogout("Session expired. Please sign in again.");
+        toast(err?.message || "Failed to reset settings");
       }
     });
   }
 }
 
 /* =========================
-   SCRIPTS MODAL
+   Scripts Modal
 ========================= */
 function ensureScriptsModal() {
   if (document.getElementById("scriptsModal")) return;
@@ -603,7 +450,7 @@ function ensureScriptsModal() {
       <div class="modalHeader">
         <div>
           <div class="modalTitle">Script Library</div>
-          <div class="modalSubtitle">Upload scripts and select up to 3 to attach for troubleshooting analysis.</div>
+          <div class="modalSubtitle">Upload scripts, select up to 3 to attach for analysis.</div>
         </div>
         <button class="btn secondary" type="button" data-close="1">Close</button>
       </div>
@@ -612,7 +459,7 @@ function ensureScriptsModal() {
         <div class="row2">
           <label class="field">
             <span class="fieldLabel">Script file (text only)</span>
-            <input class="input" type="file" id="scriptFile" accept=".txt,.ps1,.py,.sh,.bash,.yaml,.yml,.json,.tf,.hcl,.js,.ts" />
+            <input class="input" type="file" id="scriptFile" />
           </label>
 
           <label class="field">
@@ -623,8 +470,8 @@ function ensureScriptsModal() {
 
         <div class="row2">
           <label class="field">
-            <span class="fieldLabel">Language (optional, auto-detected)</span>
-            <input class="input" id="scriptLang" placeholder="PowerShell, Python, Bash..." />
+            <span class="fieldLabel">Language (optional)</span>
+            <input class="input" id="scriptLang" placeholder="PowerShell, Python, Bashâ€¦" />
           </label>
 
           <label class="field">
@@ -635,12 +482,12 @@ function ensureScriptsModal() {
 
         <div style="display:flex; justify-content:flex-end; gap:10px;">
           <button class="btn secondary" type="button" id="refreshScriptsBtn">Refresh</button>
-          <button class="btn primary" type="button" id="uploadScriptBtn">Upload Script</button>
+          <button class="btn primary" type="button" id="uploadScriptBtn">Upload</button>
         </div>
 
         <div class="field">
-          <span class="fieldLabel">Currently selected scripts (attached to chat)</span>
-          <div id="selectedScriptsRow" style="display:flex; gap:8px; flex-wrap:wrap; min-height:32px;"></div>
+          <span class="fieldLabel">Selected scripts (attached to chat)</span>
+          <div id="selectedScriptsRow" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
         </div>
 
         <div class="field">
@@ -653,9 +500,8 @@ function ensureScriptsModal() {
   document.body.appendChild(modal);
 
   modal.addEventListener("click", (e) => {
-    if (e.target?.getAttribute?.("data-close") === "1") {
-      closeScriptsModal();
-    }
+    const t = e.target;
+    if (t?.getAttribute?.("data-close") === "1") closeScriptsModal();
   });
 
   wireScriptsModalButtons();
@@ -664,7 +510,6 @@ function ensureScriptsModal() {
 function openScriptsModal() {
   const modal = document.getElementById("scriptsModal");
   if (!modal) return;
-  
   modal.classList.remove("hidden");
   renderSelectedScriptsRow();
   refreshScriptsList();
@@ -688,39 +533,25 @@ function wireScriptsModalButtons() {
     uploadBtn.dataset.bound = "1";
     uploadBtn.addEventListener("click", async () => {
       try {
-        uploadBtn.disabled = true;
-        uploadBtn.textContent = "Uploading...";
-        
         const fileInput = document.getElementById("scriptFile");
         const file = fileInput?.files?.[0];
-        
-        if (!file) {
-          toast("Please select a script file first");
-          return;
-        }
+        if (!file) return toast("Choose a script file first.");
 
         const name = document.getElementById("scriptName").value.trim();
         const language = document.getElementById("scriptLang").value.trim();
         const tags = document.getElementById("scriptTags").value.trim();
 
         await apiUploadScript({ file, name, language, tags });
-        toast("Script uploaded successfully");
-        
-        // Clear inputs
+        toast("Script uploaded.");
+        // clear inputs
         fileInput.value = "";
         document.getElementById("scriptName").value = "";
         document.getElementById("scriptLang").value = "";
         document.getElementById("scriptTags").value = "";
-        
         await refreshScriptsList();
       } catch (err) {
-        if (String(err?.message) === "unauthorized") {
-          return forceLogout("Session expired. Please sign in again.");
-        }
-        toast(err?.message || "Upload failed", 3000);
-      } finally {
-        uploadBtn.disabled = false;
-        uploadBtn.textContent = "Upload Script";
+        if (String(err?.message) === "unauthorized") return forceLogout("Session expired. Please sign in again.");
+        toast(err?.message || "Upload failed");
       }
     });
   }
@@ -730,32 +561,26 @@ async function refreshScriptsList() {
   const list = document.getElementById("scriptList");
   if (!list) return;
 
-  list.textContent = "Loading scripts...";
-  
+  list.textContent = "Loadingâ€¦";
   try {
     const scripts = await apiListScripts();
     renderScripts(scripts);
   } catch (err) {
-    if (String(err?.message) === "unauthorized") {
-      return forceLogout("Session expired. Please sign in again.");
-    }
-    list.textContent = "Failed to load scripts. Please try again.";
+    if (String(err?.message) === "unauthorized") return forceLogout("Session expired. Please sign in again.");
+    list.textContent = "Failed to load scripts.";
   }
 }
 
 function renderSelectedScriptsRow() {
   const row = document.getElementById("selectedScriptsRow");
   if (!row) return;
-  
   row.innerHTML = "";
 
   const ids = getSelectedScriptIds();
-  
   if (!ids.length) {
     const empty = document.createElement("span");
     empty.className = "badge";
-    empty.textContent = "No scripts selected";
-    empty.style.opacity = "0.6";
+    empty.textContent = "None selected";
     row.appendChild(empty);
     return;
   }
@@ -763,8 +588,7 @@ function renderSelectedScriptsRow() {
   ids.forEach((id) => {
     const b = document.createElement("span");
     b.className = "badge";
-    b.textContent = `📎 ${id.substring(0, 8)}...`;
-    b.title = `Script ID: ${id}`;
+    b.textContent = `Attached: ${id}`;
     row.appendChild(b);
   });
 }
@@ -772,7 +596,6 @@ function renderSelectedScriptsRow() {
 function renderScripts(scripts) {
   const list = document.getElementById("scriptList");
   if (!list) return;
-  
   list.innerHTML = "";
 
   const selected = new Set(getSelectedScriptIds());
@@ -780,8 +603,7 @@ function renderScripts(scripts) {
   if (!scripts.length) {
     const empty = document.createElement("div");
     empty.className = "scriptItem";
-    empty.style.opacity = "0.7";
-    empty.textContent = "No scripts uploaded yet. Upload your first script above.";
+    empty.textContent = "No scripts uploaded yet.";
     list.appendChild(empty);
     return;
   }
@@ -799,10 +621,8 @@ function renderScripts(scripts) {
 
     const sub = document.createElement("div");
     sub.className = "scriptSub";
-    const tags = Array.isArray(s.tags) && s.tags.length 
-      ? ` • tags: ${s.tags.join(", ")}` 
-      : "";
-    sub.textContent = `${s.language || "Text"} • ${s.size || 0} chars${tags}`;
+    const tags = Array.isArray(s.tags) && s.tags.length ? ` â€¢ tags: ${s.tags.join(", ")}` : "";
+    sub.textContent = `${s.language || "Text"} â€¢ ${s.size || 0} chars${tags}`;
 
     meta.appendChild(name);
     meta.appendChild(sub);
@@ -810,64 +630,49 @@ function renderScripts(scripts) {
     const actions = document.createElement("div");
     actions.className = "scriptActions";
 
-    const isSelected = selected.has(s.id);
-
-    // Select button
     const selectBtn = document.createElement("button");
     selectBtn.className = "btn secondary";
     selectBtn.type = "button";
-    selectBtn.textContent = isSelected ? "✓ Selected" : "Select";
-    selectBtn.disabled = isSelected;
+    selectBtn.textContent = selected.has(s.id) ? "Selected" : "Select";
+    selectBtn.disabled = selected.has(s.id);
     selectBtn.addEventListener("click", () => {
       const ids = getSelectedScriptIds();
       if (ids.includes(s.id)) return;
-      if (ids.length >= 3) {
-        toast("Maximum 3 scripts can be attached", 2500);
-        return;
-      }
+      if (ids.length >= 3) return toast("Limit: attach up to 3 scripts.");
       setSelectedScriptIds([...ids, s.id]);
-      toast("Script attached to chat");
+      toast("Script attached to chat.");
       renderSelectedScriptsRow();
       refreshScriptsList();
     });
 
-    // Detach button
     const removeBtn = document.createElement("button");
     removeBtn.className = "btn secondary";
     removeBtn.type = "button";
     removeBtn.textContent = "Detach";
-    removeBtn.style.display = isSelected ? "inline-block" : "none";
     removeBtn.addEventListener("click", () => {
       const ids = getSelectedScriptIds().filter((x) => x !== s.id);
       setSelectedScriptIds(ids);
-      toast("Script detached");
+      toast("Detached.");
       renderSelectedScriptsRow();
       refreshScriptsList();
     });
 
-    // Delete button
     const delBtn = document.createElement("button");
     delBtn.className = "btn secondary";
     delBtn.type = "button";
     delBtn.textContent = "Delete";
     delBtn.addEventListener("click", async () => {
-      if (!confirm(`Delete script "${s.name || s.id}"?`)) return;
-      
       try {
         await apiDeleteScript(s.id);
-        
-        // Also detach if selected
+        // also detach if selected
         const ids = getSelectedScriptIds().filter((x) => x !== s.id);
         setSelectedScriptIds(ids);
-        
-        toast("Script deleted");
+        toast("Deleted.");
         renderSelectedScriptsRow();
         refreshScriptsList();
       } catch (err) {
-        if (String(err?.message) === "unauthorized") {
-          return forceLogout("Session expired. Please sign in again.");
-        }
-        toast(err?.message || "Delete failed", 3000);
+        if (String(err?.message) === "unauthorized") return forceLogout("Session expired. Please sign in again.");
+        toast(err?.message || "Delete failed");
       }
     });
 
@@ -884,7 +689,7 @@ function renderScripts(scripts) {
 }
 
 /* =========================
-   AUTHENTICATION UI
+   Login-first gating
 ========================= */
 function setAuthUI() {
   const authed = !!getToken();
@@ -898,11 +703,11 @@ function forceLogout(msg) {
   setToken("");
   clearConversation(false);
   setAuthUI();
-  toast(msg || "Logged out", 3000);
+  toast(msg || "Logged out.");
 }
 
 /* =========================
-   CONVERSATION MANAGEMENT
+   Conversation
 ========================= */
 function clearConversation(showToast) {
   history.length = 0;
@@ -911,11 +716,11 @@ function clearConversation(showToast) {
   if (imageEl) imageEl.value = "";
   if (approveToggle) approveToggle.checked = false;
   setModePill();
-  if (showToast) toast("Conversation cleared");
+  if (showToast) toast("Conversation cleared.");
 }
 
 /* =========================
-   CHAT HELPERS
+   Chat helpers
 ========================= */
 function addBubble(role, text) {
   const div = document.createElement("div");
@@ -928,9 +733,7 @@ function addBubble(role, text) {
 
 function lastAssistantText() {
   for (let i = history.length - 1; i >= 0; i--) {
-    if (history[i].role === "assistant") {
-      return history[i].content || "";
-    }
+    if (history[i].role === "assistant") return history[i].content || "";
   }
   return "";
 }
@@ -945,7 +748,7 @@ function makeTicketNotes(text) {
     `Ticket Notes (AI-assisted)`,
     `Timestamp: ${ts}`,
     `Tool: ${APP_NAME}`,
-    `Mode: ${isApproved() ? "Remediation Approved" : "Diagnostics Only"}`,
+    `Mode: ${isApproved() ? "Remediation Approved" : "Diagnostics"}`,
     ``,
     text.trim()
   ].join("\n");
@@ -964,21 +767,18 @@ function downloadFile(filename, content, mime) {
 }
 
 /* =========================
-   EVENT LISTENERS: Buttons
+   Buttons
 ========================= */
 approveToggle?.addEventListener("change", () => setModePill());
 
 copyTicketBtn?.addEventListener("click", async () => {
   const last = lastAssistantText();
-  if (!last) {
-    toast("No response to copy yet");
-    return;
-  }
+  if (!last) return toast("Nothing to copy yet.");
   try {
     await copyToClipboard(makeTicketNotes(last));
-    toast("Ticket notes copied to clipboard");
+    toast("Ticket notes copied.");
   } catch {
-    toast("Copy failed (check browser permissions)", 3000);
+    toast("Copy failed (browser permissions).");
   }
 });
 
@@ -988,23 +788,23 @@ exportTxtBtn?.addEventListener("click", () => {
     return `=== ${label} ===\n${(t.content || "").trim()}\n`;
   });
   downloadFile("chat-export.txt", lines.join("\n"), "text/plain");
-  toast("Chat exported as TXT");
+  toast("Exported TXT.");
 });
 
 exportJsonBtn?.addEventListener("click", () => {
   const payload = {
     exported_at: new Date().toISOString(),
     tool: APP_NAME,
-    mode: isApproved() ? "remediation_approved" : "diagnostics_only",
+    mode: isApproved() ? "remediation_approved" : "diagnostics",
     history,
     selectedScriptIds: getSelectedScriptIds()
   };
   downloadFile("chat-export.json", JSON.stringify(payload, null, 2), "application/json");
-  toast("Chat exported as JSON");
+  toast("Exported JSON.");
 });
 
 /* =========================
-   PRESETS
+   Presets
 ========================= */
 const presets = {
   network: `Category: Networking (Switch/Router)
@@ -1029,7 +829,6 @@ Evidence (paste outputs):
 
 What you need:
 - Root cause hypothesis + verification steps`,
-
   server: `Category: Server OS / Services
 Goal: Diagnostics only (no changes)
 
@@ -1049,7 +848,6 @@ Evidence (paste outputs/logs):
 
 What you need:
 - Likely causes ranked + verification commands + what to look for`,
-
   script: `Category: Script / Automation
 Goal: Fix explanation + corrected snippet (no destructive steps unless approved)
 
@@ -1067,7 +865,6 @@ Context:
 
 What you need:
 - Root cause + corrected code + validation steps`,
-
   hardware: `Category: Hardware / Components
 Goal: Diagnostics only (no changes)
 
@@ -1102,7 +899,7 @@ function presetFill(key, opts = { focus: true, expand: true, silent: false }) {
   messageEl.value = presets[key];
   if (opts.expand) expandMessageBox();
   if (opts.focus) messageEl.focus();
-  if (!opts.silent) toast(`Loaded ${key} template`);
+  if (!opts.silent) toast(`Loaded ${key} template.`);
 }
 
 document.querySelectorAll("[data-preset]").forEach((btn) => {
@@ -1113,22 +910,16 @@ document.querySelectorAll("[data-preset]").forEach((btn) => {
 });
 
 /* =========================
-   CHAT SUBMIT
+   Chat submit
 ========================= */
 form?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const token = getToken();
-  if (!token) {
-    toast("Please login first", 2500);
-    return;
-  }
+  if (!token) return toast("Please login first.");
 
   const rawMessage = (messageEl?.value || "").trim();
-  if (!rawMessage) {
-    toast("Please enter a message", 2000);
-    return;
-  }
+  if (!rawMessage) return;
 
   const approvalHeader = isApproved()
     ? "APPROVAL: APPROVED (maintenance window OK; backups OK; rollback OK)"
@@ -1140,13 +931,8 @@ form?.addEventListener("submit", async (e) => {
   history.push({ role: "user", content: message });
 
   messageEl.value = "";
-  
-  if (sendBtn) {
-    sendBtn.disabled = true;
-    sendBtn.textContent = "Analyzing...";
-  }
 
-  const working = addBubble("assistant", "🔍 Analyzing... diagnostics in progress...");
+  const working = addBubble("assistant", "Analyzingâ€¦ diagnostics in progressâ€¦");
 
   try {
     const fd = new FormData();
@@ -1154,9 +940,7 @@ form?.addEventListener("submit", async (e) => {
     fd.append("history", JSON.stringify(history));
     fd.append("selectedScriptIds", JSON.stringify(getSelectedScriptIds()));
 
-    if (imageEl?.files?.[0]) {
-      fd.append("image", imageEl.files[0]);
-    }
+    if (imageEl?.files?.[0]) fd.append("image", imageEl.files[0]);
 
     const resp = await fetch(window.BACKEND_URL, {
       method: "POST",
@@ -1166,47 +950,33 @@ form?.addEventListener("submit", async (e) => {
 
     const data = await resp.json().catch(() => ({}));
 
-    if (resp.status === 401) {
-      return forceLogout("Session expired. Please sign in again.");
-    }
-
+    if (resp.status === 401) return forceLogout("Session expired. Please sign in again.");
     if (!resp.ok || !data.ok) {
-      working.textContent = `❌ Error: ${data.error || resp.statusText}`;
-      toast("Request failed", 3000);
+      working.textContent = `Error: ${data.error || resp.statusText}`;
       return;
     }
 
     working.textContent = data.text || "(No response text)";
     history.push({ role: "assistant", content: data.text || "" });
-    toast("Response received");
+    toast("Response received.");
   } catch (err) {
-    working.textContent = `❌ Error: ${err?.message || "Request failed"}`;
-    toast("Network error occurred", 3000);
+    working.textContent = `Error: ${err?.message || "Request failed"}`;
   } finally {
     if (imageEl) imageEl.value = "";
-    if (sendBtn) {
-      sendBtn.disabled = false;
-      sendBtn.textContent = "Send";
-    }
   }
 });
 
 /* =========================
-   LOGIN / LOGOUT
+   Login / Logout + settings bootstrap
 ========================= */
 loginForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  
   try {
     const username = (loginUser?.value || "").trim();
     const password = (loginPass?.value || "").trim();
-    
-    if (!username || !password) {
-      toast("Enter username and password", 2500);
-      return;
-    }
+    if (!username || !password) return toast("Enter username and password.");
 
-    if (authStatus) authStatus.textContent = "Signing in...";
+    authStatus && (authStatus.textContent = "Signing inâ€¦");
 
     const resp = await fetch(window.LOGIN_URL, {
       method: "POST",
@@ -1215,34 +985,32 @@ loginForm?.addEventListener("submit", async (e) => {
     });
 
     const data = await resp.json().catch(() => ({}));
-    
     if (!resp.ok || !data.ok || !data.token) {
-      if (authStatus) authStatus.textContent = "";
-      toast(data.error || "Login failed", 3000);
-      return;
+      authStatus && (authStatus.textContent = "");
+      return toast(data.error || "Login failed.");
     }
 
     setToken(data.token);
     loginPass.value = "";
-    if (authStatus) authStatus.textContent = "";
+    authStatus && (authStatus.textContent = "");
 
     setAuthUI();
     ensureUtilityButtons();
 
-    // Fetch server-side settings (non-fatal if fails)
+    // fetch server-side settings (optional; non-fatal)
     try {
       const s = await apiGetSettings();
       cacheSettings({ ...defaultSettings(), ...s });
       applySettingsToUI(loadCachedSettings());
     } catch {
-      // Fall back to cached settings
+      // fall back to cached
       applySettingsToUI(loadCachedSettings());
     }
 
-    toast(`Welcome to ${APP_NAME}`, 2500);
+    toast(`${APP_NAME}: login successful.`);
   } catch (err) {
-    if (authStatus) authStatus.textContent = "";
-    toast(err?.message || "Login error", 3000);
+    authStatus && (authStatus.textContent = "");
+    toast(err?.message || "Login error.");
   }
 });
 
@@ -1250,71 +1018,13 @@ logoutBtn?.addEventListener("click", () => {
   setToken("");
   clearConversation(false);
   setAuthUI();
-  toast("Logged out successfully");
+  toast("Logged out.");
 });
 
 /* =========================
-   KEYBOARD SHORTCUTS
-========================= */
-messageEl?.addEventListener("keydown", (e) => {
-  // Ctrl/Cmd + Enter to submit
-  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-    e.preventDefault();
-    form?.requestSubmit();
-  }
-});
-
-/* =========================
-   SIDEBAR TOGGLE
-========================= */
-function setupSidebarToggle() {
-  const sidebar = document.querySelector('.sidebar');
-  const sidebarToggle = document.getElementById('sidebarToggle');
-  const sidebarFloatingToggle = document.getElementById('sidebarFloatingToggle');
-  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-
-  // Desktop toggle (inside sidebar)
-  sidebarToggle?.addEventListener('click', () => {
-    sidebar?.classList.toggle('collapsed');
-    localStorage.setItem('sidebarCollapsed', sidebar?.classList.contains('collapsed'));
-  });
-
-  // Floating toggle (appears when collapsed)
-  sidebarFloatingToggle?.addEventListener('click', () => {
-    sidebar?.classList.remove('collapsed');
-    localStorage.setItem('sidebarCollapsed', 'false');
-  });
-
-  // Mobile toggle
-  mobileMenuBtn?.addEventListener('click', () => {
-    sidebar?.classList.toggle('open');
-  });
-
-  // Close sidebar when clicking outside on mobile
-  document.addEventListener('click', (e) => {
-    if (window.innerWidth <= 768) {
-      if (sidebar?.classList.contains('open') && 
-          !sidebar.contains(e.target) && 
-          e.target !== mobileMenuBtn) {
-        sidebar.classList.remove('open');
-      }
-    }
-  });
-
-  // Restore sidebar state
-  const wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-  if (wasCollapsed) {
-    sidebar?.classList.add('collapsed');
-  }
-}
-
-/* =========================
-   INITIALIZATION
+   Init
 ========================= */
 setModePill();
 setAuthUI();
 ensureUtilityButtons();
 applySettingsToUI(loadCachedSettings());
-setupSidebarToggle();
-
-console.log(`${APP_NAME} v1.2.0 initialized`);
