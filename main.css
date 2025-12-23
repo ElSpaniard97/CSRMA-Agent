@@ -1,69 +1,146 @@
 /* =========================
-   THEME TOKENS
+   DESIGN TOKENS (Seamless UI)
    - Default: follows system (prefers-color-scheme)
    - Override: html[data-theme="dark"] or "light"
 ========================= */
 :root{
-  --font: system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  /* Typography */
+  --font: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-  /* default values, overridden below by system/light/dark blocks */
-  --bg: #0b1220;
-  --card: rgba(255,255,255,.05);
-  --border: rgba(255,255,255,.10);
   --text: rgba(255,255,255,.92);
-  --muted: rgba(255,255,255,.65);
+  --text-strong: rgba(255,255,255,.96);
+  --muted: rgba(255,255,255,.68);
+  --muted-2: rgba(255,255,255,.58);
 
+  /* Surfaces */
+  --bg: #0b1220;
+  --surface-0: rgba(0,0,0,.00);
+  --surface-1: rgba(255,255,255,.05);   /* cards */
+  --surface-2: rgba(255,255,255,.08);   /* hover/raised */
+  --surface-3: rgba(255,255,255,.10);   /* strong */
+
+  --border: rgba(255,255,255,.10);
+  --border-strong: rgba(255,255,255,.16);
+
+  /* Brand */
   --primary: #3b82f6;
+  --primary-2: rgba(59,130,246,.18);
   --danger: #ef4444;
+  --danger-2: rgba(239,68,68,.16);
+  --success: #10b981;
+  --success-2: rgba(16,185,129,.14);
 
+  /* Shape + depth */
+  --radius-sm: 12px;
   --radius: 14px;
+  --radius-lg: 18px;
+
+  --shadow-sm: 0 6px 18px rgba(0,0,0,.18);
   --shadow: 0 10px 30px rgba(0,0,0,.25);
+
+  /* Motion */
+  --ease: cubic-bezier(.2,.8,.2,1);
+  --speed: 140ms;
+
+  /* Focus ring */
+  --ring: 0 0 0 3px rgba(59,130,246,.35);
 }
 
 /* System-based theme defaults */
 @media (prefers-color-scheme: light){
   :root{
     --bg: #f6f8fc;
-    --card: rgba(10,20,40,.05);
-    --border: rgba(10,20,40,.10);
+
     --text: rgba(10,20,40,.92);
+    --text-strong: rgba(10,20,40,.96);
     --muted: rgba(10,20,40,.62);
-    --shadow: 0 10px 30px rgba(10,20,40,.10);
+    --muted-2: rgba(10,20,40,.52);
+
+    --surface-1: rgba(10,20,40,.05);
+    --surface-2: rgba(10,20,40,.07);
+    --surface-3: rgba(10,20,40,.10);
+
+    --border: rgba(10,20,40,.10);
+    --border-strong: rgba(10,20,40,.14);
+
+    --shadow-sm: 0 6px 18px rgba(10,20,40,.10);
+    --shadow: 0 10px 30px rgba(10,20,40,.12);
+
+    --ring: 0 0 0 3px rgba(59,130,246,.25);
   }
 }
 
 /* Explicit overrides */
 html[data-theme="dark"]{
   --bg: #0b1220;
-  --card: rgba(255,255,255,.05);
-  --border: rgba(255,255,255,.10);
+
   --text: rgba(255,255,255,.92);
-  --muted: rgba(255,255,255,.65);
+  --text-strong: rgba(255,255,255,.96);
+  --muted: rgba(255,255,255,.68);
+  --muted-2: rgba(255,255,255,.58);
+
+  --surface-1: rgba(255,255,255,.05);
+  --surface-2: rgba(255,255,255,.08);
+  --surface-3: rgba(255,255,255,.10);
+
+  --border: rgba(255,255,255,.10);
+  --border-strong: rgba(255,255,255,.16);
+
+  --shadow-sm: 0 6px 18px rgba(0,0,0,.18);
   --shadow: 0 10px 30px rgba(0,0,0,.25);
+
+  --ring: 0 0 0 3px rgba(59,130,246,.35);
 }
 html[data-theme="light"]{
   --bg: #f6f8fc;
-  --card: rgba(10,20,40,.05);
-  --border: rgba(10,20,40,.10);
+
   --text: rgba(10,20,40,.92);
+  --text-strong: rgba(10,20,40,.96);
   --muted: rgba(10,20,40,.62);
-  --shadow: 0 10px 30px rgba(10,20,40,.10);
+  --muted-2: rgba(10,20,40,.52);
+
+  --surface-1: rgba(10,20,40,.05);
+  --surface-2: rgba(10,20,40,.07);
+  --surface-3: rgba(10,20,40,.10);
+
+  --border: rgba(10,20,40,.10);
+  --border-strong: rgba(10,20,40,.14);
+
+  --shadow-sm: 0 6px 18px rgba(10,20,40,.10);
+  --shadow: 0 10px 30px rgba(10,20,40,.12);
+
+  --ring: 0 0 0 3px rgba(59,130,246,.25);
 }
 
+/* =========================
+   Base / Reset
+========================= */
 *{ box-sizing:border-box; }
 .hidden{ display:none !important; }
+
+html, body{ height:100%; }
 
 body{
   margin:0;
   font-family:var(--font);
+  color:var(--text);
   background:
     radial-gradient(900px 600px at 20% 0%, rgba(59,130,246,.14), transparent 60%),
     radial-gradient(900px 600px at 85% 10%, rgba(16,185,129,.08), transparent 55%),
     var(--bg);
-  color:var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Layout */
+::selection{ background: rgba(59,130,246,.25); }
+a{ color: inherit; }
+
+/* =========================
+   Layout (legacy container helpers)
+========================= */
 .container{
   max-width:980px;
   margin:0 auto;
@@ -72,8 +149,8 @@ body{
 
 .header{ margin-bottom:14px; }
 
+/* Brand */
 .brand{ display:flex; gap:12px; align-items:center; }
-
 .logo{
   width:44px;height:44px;
   display:grid; place-items:center;
@@ -81,22 +158,27 @@ body{
   background: linear-gradient(135deg, rgba(59,130,246,.55), rgba(16,185,129,.18));
   border:1px solid var(--border);
   font-weight:900;
+  color: var(--text-strong);
 }
 
-h1{ margin:0; font-size:26px; letter-spacing:-0.02em; }
+h1{ margin:0; font-size:26px; letter-spacing:-0.02em; color: var(--text-strong); }
 p{ margin:6px 0 0; color:var(--muted); }
 
-/* Cards */
+/* =========================
+   Cards (unified)
+========================= */
 .card{
-  background:var(--card);
+  background: var(--surface-1);
   border:1px solid var(--border);
-  border-radius:var(--radius);
+  border-radius: var(--radius-lg);
   padding:16px;
   margin-bottom:12px;
   box-shadow: var(--shadow);
 }
 
-/* Controls */
+/* =========================
+   Controls (legacy bar)
+========================= */
 .controls{
   display:flex;
   justify-content:space-between;
@@ -113,21 +195,18 @@ p{ margin:6px 0 0; color:var(--muted); }
   flex-wrap:wrap;
 }
 
+/* Pills */
 .pill{
   padding:7px 10px;
   border-radius:999px;
-  background: rgba(0,0,0,.08);
+  background: var(--surface-1);
   border:1px solid var(--border);
   font-size:13px;
   font-weight:800;
+  color: var(--text-strong);
 }
-
-html[data-theme="light"] .pill{
-  background: rgba(255,255,255,.8);
-}
-
 .pill.danger{
-  background: rgba(239,68,68,.14);
+  background: var(--danger-2);
   border-color: rgba(239,68,68,.30);
 }
 
@@ -139,23 +218,24 @@ html[data-theme="light"] .pill{
   padding:7px 10px;
   border-radius:999px;
   border:1px solid var(--border);
-  background: rgba(0,0,0,.06);
+  background: var(--surface-1);
   cursor:pointer;
   user-select:none;
+  transition: background var(--speed) var(--ease), border-color var(--speed) var(--ease);
 }
-
-html[data-theme="light"] .toggle{
-  background: rgba(255,255,255,.75);
+.toggle:hover{
+  background: var(--surface-2);
+  border-color: var(--border-strong);
 }
-
 .toggle input{ display:none; }
 
 .toggleUi{
   width:42px;height:24px;
   border-radius:999px;
   border:1px solid var(--border);
-  background: rgba(255,255,255,.12);
+  background: rgba(255,255,255,.10);
   position:relative;
+  transition: background var(--speed) var(--ease), border-color var(--speed) var(--ease);
 }
 
 .toggleUi::after{
@@ -166,7 +246,11 @@ html[data-theme="light"] .toggle{
   top:50%;left:3px;
   transform:translateY(-50%);
   background: rgba(255,255,255,.92);
-  transition: all .18s ease;
+  transition: all 180ms var(--ease);
+}
+
+html[data-theme="light"] .toggleUi::after{
+  background: rgba(10,20,40,.92);
 }
 
 .toggle input:checked + .toggleUi::after{
@@ -180,59 +264,75 @@ html[data-theme="light"] .toggle{
   font-weight:800;
 }
 
-/* Buttons */
+/* =========================
+   Buttons (unified)
+========================= */
 .btn{
   padding:10px 12px;
-  border-radius:12px;
+  border-radius: var(--radius-sm);
   border:1px solid var(--border);
-  font-weight:900;
+  font-weight: 800;
   cursor:pointer;
-  background: rgba(0,0,0,.06);
-  color: var(--text);
+  background: var(--surface-1);
+  color: var(--text-strong);
+  transition: transform var(--speed) var(--ease),
+              background var(--speed) var(--ease),
+              border-color var(--speed) var(--ease),
+              filter var(--speed) var(--ease);
 }
-
-html[data-theme="light"] .btn{
-  background: rgba(255,255,255,.78);
+.btn:hover{
+  background: var(--surface-2);
+  border-color: var(--border-strong);
 }
+.btn:active{ transform: translateY(1px); }
+.btn:focus-visible{ outline:none; box-shadow: var(--ring); }
 
 .btn.primary{
   background: var(--primary);
   color:#071024;
   border-color: rgba(59,130,246,.35);
 }
+.btn.primary:hover{ filter: brightness(1.03); }
 
 .btn.secondary{
-  background: rgba(0,0,0,.06);
+  background: var(--surface-1);
 }
 
-.btn:active{ transform: translateY(1px); }
-
-/* Inputs */
+/* =========================
+   Inputs (unified)
+========================= */
 .input{
   flex:1;
   min-width:min(520px, 100%);
   padding:10px 12px;
-  border-radius:12px;
+  border-radius: var(--radius-sm);
   border:1px solid var(--border);
-  background: rgba(0,0,0,.06);
-  color: var(--text);
+  background: var(--surface-1);
+  color: var(--text-strong);
   outline:none;
+  transition: box-shadow var(--speed) var(--ease),
+              border-color var(--speed) var(--ease),
+              background var(--speed) var(--ease);
 }
+.input::placeholder{ color: var(--muted-2); }
 
-html[data-theme="light"] .input{
-  background: rgba(255,255,255,.85);
+.input:focus{
+  border-color: rgba(59,130,246,.35);
+  box-shadow: var(--ring);
+  background: var(--surface-2);
 }
 
 textarea.input{
   resize: vertical;
   min-height: 44px;
 }
-
 textarea.input.expanded{
   min-height: 220px;
 }
 
-/* Presets */
+/* =========================
+   Presets (legacy chips)
+========================= */
 .presets{
   display:flex;
   gap:10px;
@@ -244,18 +344,23 @@ textarea.input.expanded{
   padding:8px 10px;
   border-radius:999px;
   border:1px solid var(--border);
-  background: rgba(0,0,0,.06);
-  color: var(--text);
+  background: var(--surface-1);
+  color: var(--text-strong);
   cursor:pointer;
-  font-weight:900;
+  font-weight:800;
   font-size:13px;
+  transition: background var(--speed) var(--ease),
+              border-color var(--speed) var(--ease),
+              transform var(--speed) var(--ease);
 }
 
-html[data-theme="light"] .chip{
-  background: rgba(255,255,255,.78);
+.chip:hover{
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
 }
 
-.chip:hover{ filter: brightness(1.05); }
+.chip:focus-visible{ outline:none; box-shadow: var(--ring); }
 
 .hint{
   color:var(--muted);
@@ -263,7 +368,9 @@ html[data-theme="light"] .chip{
   margin-left:6px;
 }
 
-/* Chat */
+/* =========================
+   Chat
+========================= */
 .chatWrap{ padding:0; }
 
 .chat{
@@ -275,29 +382,28 @@ html[data-theme="light"] .chip{
 .bubble{
   max-width:88%;
   padding:11px 12px;
-  border-radius:14px;
+  border-radius: var(--radius);
   border:1px solid var(--border);
   margin:10px 0;
   white-space:pre-wrap;
   line-height:1.55;
-  background: rgba(0,0,0,.06);
-}
-
-html[data-theme="light"] .bubble{
-  background: rgba(255,255,255,.82);
+  background: var(--surface-1);
+  color: var(--text-strong);
 }
 
 .bubble.user{
   margin-left:auto;
-  background: rgba(59,130,246,.12);
-  border-color: rgba(59,130,246,.22);
+  background: var(--primary-2);
+  border-color: rgba(59,130,246,.25);
 }
 
 .bubble.assistant{
   margin-right:auto;
 }
 
-/* Composer */
+/* =========================
+   Composer (legacy)
+========================= */
 .composerWrap{ padding:16px; }
 
 .composer{
@@ -312,17 +418,17 @@ html[data-theme="light"] .bubble{
   align-items:center;
   gap:8px;
   padding:10px 12px;
-  border-radius:12px;
+  border-radius: var(--radius-sm);
   border:1px solid var(--border);
-  background: rgba(0,0,0,.06);
+  background: var(--surface-1);
   cursor:pointer;
-  font-weight:900;
+  font-weight:800;
+  transition: background var(--speed) var(--ease), border-color var(--speed) var(--ease);
 }
-
-html[data-theme="light"] .fileBtn{
-  background: rgba(255,255,255,.78);
+.fileBtn:hover{
+  background: var(--surface-2);
+  border-color: var(--border-strong);
 }
-
 .fileBtn input{ display:none; }
 
 .footnote{
@@ -331,14 +437,16 @@ html[data-theme="light"] .fileBtn{
   font-size:12px;
 }
 
-/* Toast */
+/* =========================
+   Toast
+========================= */
 .toast{
   position:fixed;
   bottom:16px;
   left:50%;
   transform:translateX(-50%);
   padding:10px 12px;
-  border-radius:12px;
+  border-radius: var(--radius-sm);
   border:1px solid var(--border);
   background: rgba(0,0,0,.55);
   color: rgba(255,255,255,.92);
@@ -347,10 +455,15 @@ html[data-theme="light"] .fileBtn{
   transition:opacity .15s ease;
   max-width:min(720px, 92vw);
 }
-
+html[data-theme="light"] .toast{
+  background: rgba(10,20,40,.65);
+  color: rgba(255,255,255,.92);
+}
 .toast.show{ opacity:1; }
 
-/* Login screen */
+/* =========================
+   Login screen
+========================= */
 .centerPage{
   min-height:100vh;
   display:grid;
@@ -362,7 +475,9 @@ html[data-theme="light"] .fileBtn{
   width:min(520px, 100%);
 }
 
-/* Modal (settings) */
+/* =========================
+   Modal (baseline; app.js injects additional modal CSS)
+========================= */
 .modal{
   position:fixed;
   inset:0;
@@ -382,15 +497,17 @@ html[data-theme="light"] .fileBtn{
   width:min(680px, 92vw);
   background: rgba(20,28,48,.92);
   border:1px solid rgba(255,255,255,.12);
-  border-radius:16px;
+  border-radius: 16px;
   padding:14px;
   backdrop-filter: blur(10px);
   color: rgba(255,255,255,.92);
+  box-shadow: var(--shadow);
 }
 
 html[data-theme="light"] .modalCard{
   background: rgba(255,255,255,.92);
   color: rgba(10,20,40,.92);
+  border:1px solid rgba(10,20,40,.12);
 }
 
 .modalHeader{
@@ -440,7 +557,7 @@ html[data-theme="light"] .modalHeader{
   align-items:center;
   padding:10px 10px;
   border:1px solid rgba(255,255,255,.10);
-  border-radius:12px;
+  border-radius: var(--radius-sm);
   background: rgba(0,0,0,.10);
 }
 
@@ -459,6 +576,7 @@ html[data-theme="light"] .field.row{
   gap:10px;
   padding-top:8px;
 }
+
 /* =========================
    ChatGPT-like Layout
 ========================= */
@@ -476,12 +594,13 @@ html[data-theme="light"] .field.row{
   height:100vh;
   overflow:auto;
   border-right:1px solid var(--border);
-  background: rgba(0,0,0,.06);
-  padding:14px;
+  padding:14px 12px;
+  background: rgba(0,0,0,.14);
 }
 
 html[data-theme="light"] .sidebar{
-  background: rgba(255,255,255,.65);
+  background: rgba(255,255,255,.55);
+  border-right:1px solid var(--border);
 }
 
 .sidebarHeader{
@@ -503,9 +622,13 @@ html[data-theme="light"] .sidebar{
   margin-top:12px;
   padding:12px;
   border:1px solid var(--border);
-  border-radius:var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  background: rgba(0,0,0,.10);
+  box-shadow: none;
+}
+
+html[data-theme="light"] .sidebarSection{
+  background: rgba(255,255,255,.55);
 }
 
 .sidebarLabel{
@@ -529,9 +652,13 @@ html[data-theme="light"] .sidebar{
   margin-top:12px;
   padding:12px;
   border:1px solid var(--border);
-  border-radius:var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  background: rgba(0,0,0,.10);
+  box-shadow: none;
+}
+
+html[data-theme="light"] .sidebarFooter{
+  background: rgba(255,255,255,.55);
 }
 
 /* Main panel */
@@ -551,12 +678,14 @@ html[data-theme="light"] .sidebar{
   margin:0;
   font-size:22px;
   letter-spacing:-0.02em;
+  color: var(--text-strong);
 }
 
 .topSubtitle{
   margin:6px 0 0;
   color:var(--muted);
 }
+
 /* Chat height: resemble ChatGPT */
 .chatWrap{ margin-bottom:12px; }
 .chat{
@@ -609,6 +738,7 @@ html[data-theme="light"] .sidebar{
   font-size: 32px;
   font-weight: 900;
   letter-spacing: -0.02em;
+  color: var(--text-strong);
 }
 
 .heroSubtitle{
@@ -636,23 +766,27 @@ html[data-theme="light"] .sidebar{
 /* Preset card styling */
 .presetCard{
   border: 1px solid var(--border);
-  background: rgba(0,0,0,.10);
+  background: var(--surface-1);
   border-radius: calc(var(--radius) + 4px);
   padding: 16px;
   text-align: left;
   box-shadow: var(--shadow);
   cursor: pointer;
-  transition: transform .12s ease, border-color .12s ease, background .12s ease;
-}
-
-html[data-theme="light"] .presetCard{
-  background: rgba(255,255,255,.55);
+  transition: transform 120ms var(--ease),
+              border-color 120ms var(--ease),
+              background 120ms var(--ease),
+              filter 120ms var(--ease);
 }
 
 .presetCard:hover{
   transform: translateY(-1px);
   border-color: rgba(120,170,255,.35);
-  background: rgba(60,110,200,.10);
+  background: var(--surface-2);
+}
+
+.presetCard:focus-visible{
+  outline:none;
+  box-shadow: var(--ring);
 }
 
 .presetHeader{
@@ -673,19 +807,16 @@ html[data-theme="light"] .presetHeader{
   display: grid;
   place-items: center;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.10);
+  border: 1px solid var(--border);
+  background: var(--surface-1);
   font-weight: 900;
-}
-
-html[data-theme="light"] .presetIcon{
-  border: 1px solid rgba(10,20,40,.12);
-  background: rgba(10,20,40,.04);
+  color: var(--text-strong);
 }
 
 .presetName{
   font-weight: 900;
   font-size: 18px;
+  color: var(--text-strong);
 }
 
 .presetDesc{
@@ -700,10 +831,11 @@ html[data-theme="light"] .presetIcon{
   width: 100%;
   text-align: center;
   padding: 10px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background: rgba(70,120,220,.45);
   border: 1px solid rgba(120,170,255,.25);
   font-weight: 900;
+  color: var(--text-strong);
 }
 
 /* Chat panel: keep it tall but not infinite */
@@ -740,17 +872,21 @@ html[data-theme="light"] .presetIcon{
   }
 }
 
-/* Attachment button matches screenshot (+) */
+/* Attachment button (+) */
 .attachBtn{
   display: grid;
   place-items: center;
-  border-radius: 14px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
-  background: rgba(0,0,0,.10);
+  background: var(--surface-1);
   cursor: pointer;
   user-select: none;
+  transition: background var(--speed) var(--ease), border-color var(--speed) var(--ease);
 }
-
+.attachBtn:hover{
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
 .attachBtn input{ display:none; }
 
 .attachPlus{
@@ -760,14 +896,14 @@ html[data-theme="light"] .presetIcon{
 }
 
 .composerInput{
-  border-radius: 14px;
+  border-radius: var(--radius);
   padding: 14px 14px;
   resize: none;
   min-height: 56px;
 }
 
 .sendBtn{
-  border-radius: 14px;
+  border-radius: var(--radius);
   font-weight: 900;
 }
 
@@ -780,24 +916,18 @@ html[data-theme="light"] .presetIcon{
   gap: 10px;
 }
 
-/* Sidebar: cleaner rail + dividers */
-.sidebar{
-  padding: 14px 12px;
-  border-right: 1px solid rgba(255,255,255,.08);
-  background: rgba(0,0,0,.14);
-}
+/* =========================
+   Optional: nicer scrollbars
+========================= */
+*{ scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.22) transparent; }
+html[data-theme="light"] *{ scrollbar-color: rgba(10,20,40,.22) transparent; }
 
-html[data-theme="light"] .sidebar{
-  border-right: 1px solid rgba(10,20,40,.10);
-  background: rgba(255,255,255,.55);
+::-webkit-scrollbar{ width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,.18);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
-
-.sidebarSection{
-  box-shadow: none;                /* flatter like the screenshot */
-  background: rgba(0,0,0,.10);
-}
-
-html[data-theme="light"] .sidebarSection{
-  background: rgba(255,255,255,.55);
-}
-
+html[data-theme="light"] ::-webkit-scrollbar-thumb{ background: rgba(10,20,40,.18); }
+::-webkit-scrollbar-track{ background: transparent; }
