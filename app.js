@@ -3,6 +3,8 @@ const APP_NAME = "Infra Troubleshooting Agent";
 const TOKEN_KEY = "ai_agent_token";
 const SETTINGS_CACHE_KEY = "ai_agent_settings_cache_v2";
 const SELECTED_SCRIPTS_KEY = "ai_agent_selected_scripts_v1";
+const SIDEBAR_STATE_KEY = "ai_agent_sidebar_state_v1";
+
 
 const loginScreen = document.getElementById("loginScreen");
 const appShell = document.getElementById("appShell");
@@ -797,6 +799,28 @@ function downloadFile(filename, content, mime) {
   URL.revokeObjectURL(url);
 }
 
+function getSidebarState() {
+  return localStorage.getItem(SIDEBAR_STATE_KEY) || "expanded";
+}
+
+function applySidebarState(state) {
+  const root = document.documentElement;
+  if (state === "collapsed") root.setAttribute("data-sidebar", "collapsed");
+  else root.removeAttribute("data-sidebar");
+
+  const btn = document.getElementById("sidebarToggle");
+  if (btn) {
+    btn.setAttribute("aria-label", state === "collapsed" ? "Expand sidebar" : "Collapse sidebar");
+    btn.title = state === "collapsed" ? "Expand sidebar" : "Collapse sidebar";
+  }
+}
+
+function toggleSidebar() {
+  const next = getSidebarState() === "collapsed" ? "expanded" : "collapsed";
+  localStorage.setItem(SIDEBAR_STATE_KEY, next);
+  applySidebarState(next);
+}
+
 /* =========================
    Buttons
 ========================= */
@@ -1058,3 +1082,7 @@ setModePill();
 setAuthUI();
 ensureUtilityButtons();
 applySettingsToUI(loadCachedSettings());
+
+// Sidebar collapse (persisted)
+applySidebarState(getSidebarState());
+document.getElementById("sidebarToggle")?.addEventListener("click", toggleSidebar);
