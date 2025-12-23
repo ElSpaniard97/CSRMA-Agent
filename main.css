@@ -660,6 +660,105 @@ html[data-theme="light"] .sidebarSection{
 html[data-theme="light"] .sidebarFooter{
   background: rgba(255,255,255,.55);
 }
+/* =========================
+   Collapsible Sidebar
+========================= */
+:root{
+  --sidebar-expanded: 320px;
+  --sidebar-collapsed: 76px;
+}
+
+.appLayout{
+  grid-template-columns: var(--sidebar-expanded) 1fr;
+  transition: grid-template-columns 180ms var(--ease);
+}
+
+/* Toggle button styling */
+.sidebarHeaderRow{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.iconBtn{
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-strong);
+  cursor: pointer;
+  display:grid;
+  place-items:center;
+  transition: transform var(--speed) var(--ease),
+              background var(--speed) var(--ease),
+              border-color var(--speed) var(--ease);
+}
+.iconBtn:hover{
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+.iconBtn:focus-visible{ outline:none; box-shadow: var(--ring); }
+
+.iconChevron{
+  font-weight: 900;
+  line-height: 1;
+  transform: translateX(-1px);
+}
+
+/* Collapsed state */
+html[data-sidebar="collapsed"] .appLayout{
+  grid-template-columns: var(--sidebar-collapsed) 1fr;
+}
+
+html[data-sidebar="collapsed"] .sidebar{
+  padding: 14px 10px;
+}
+
+/* Hide text labels while collapsed (keep icons/controls) */
+html[data-sidebar="collapsed"] .sidebar .sidebarBrandText,
+html[data-sidebar="collapsed"] .sidebar .sidebarLabel,
+html[data-sidebar="collapsed"] .sidebar .toggleText{
+  display:none !important;
+}
+
+/* Tighten sections and center items */
+html[data-sidebar="collapsed"] .sidebarSection{
+  padding: 10px;
+}
+
+html[data-sidebar="collapsed"] .sidebarPresets{
+  gap: 8px;
+}
+html[data-sidebar="collapsed"] .chip{
+  width: 100%;
+  text-align:center;
+  padding: 10px 0;
+}
+
+/* Buttons stack nicely */
+html[data-sidebar="collapsed"] .sidebarActions .btn,
+html[data-sidebar="collapsed"] .sidebarFooter .btn{
+  padding: 10px 0;
+}
+
+/* Rotate chevron to indicate expand */
+html[data-sidebar="collapsed"] #sidebarToggle .iconChevron{
+  transform: rotate(180deg);
+}
+
+/* On small screens, keep current responsive behavior (sidebar becomes top section) */
+@media (max-width: 920px){
+  html[data-sidebar="collapsed"] .appLayout{
+    grid-template-columns: 1fr;
+  }
+  html[data-sidebar="collapsed"] .sidebar .sidebarBrandText,
+  html[data-sidebar="collapsed"] .sidebar .sidebarLabel,
+  html[data-sidebar="collapsed"] .sidebar .toggleText{
+    display: initial !important; /* don’t hide on mobile stacked layout */
+  }
+}
 
 /* Main panel */
 .mainPanel{
