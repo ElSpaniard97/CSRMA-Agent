@@ -4,7 +4,7 @@
 
 A production-ready web application for AI-assisted infrastructure troubleshooting, designed for real-world IT operations workflows. Enforces diagnostics before remediation, requires explicit approval for production-impacting changes, and produces clean outputs suitable for incident tickets.
 
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/elspaniard97/csrma-agent)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://elspaniard97.github.io/CSRMA-Agent/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ---
@@ -90,7 +90,7 @@ A production-ready web application for AI-assisted infrastructure troubleshootin
 
 | Service | URL |
 |---------|-----|
-| **Frontend** | https://elspaniard97.github.io/csrma-agent/ |
+| **Frontend** | https://elspaniard97.github.io/CSRMA-Agent/ |
 | **Backend** | https://csrma-agent.onrender.com |
 | **Health Check** | https://csrma-agent.onrender.com/healthz |
 
@@ -488,7 +488,7 @@ SOFTWARE.
 IT Infrastructure / Automation / AI-assisted Operations
 
 - GitHub: [@elspaniard97](https://github.com/elspaniard97)
-- Project: [imbedded-csrma-ai-agent](https://github.com/elspaniard97/csrma-agent)
+- Project: [imbedded-csrma-ai-agent](https://elspaniard97.github.io/CSRMA-Agent/)
 
 ---
 
@@ -504,7 +504,7 @@ IT Infrastructure / Automation / AI-assisted Operations
 ## 📞 Support
 
 For issues, questions, or feature requests:
-- Open an issue: [GitHub Issues](https://github.com/elspaniard97/csrma-agent/issues)
+- Open an issue: [GitHub Issues](https://elspaniard97.github.io/CSRMA-Agent//issues)
 - Check existing issues before creating new ones
 - Provide detailed reproduction steps for bugs
 
