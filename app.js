@@ -251,12 +251,21 @@ async function apiDeleteScript(id) {
    Utility buttons + Modals
 ========================= */
 function ensureUtilityButtons() {
-  // New layout targets
+  // New layout targets (ChatGPT-like sidebar)
   const sidebarActions = document.getElementById("sidebarActions");
   const sidebarTopSection = document.querySelector(".sidebarSection"); // first section with mode/toggle
-  if (!sidebarActions || !sidebarTopSection) return;
 
-  // Clear button (goes above exports for quick access)
+  // Backward-compatible fallback (if you ever restore the old top bar)
+  const controlsLeft = document.querySelector(".controls .left");
+  const controlsRight = document.querySelector(".controls .right");
+
+  const hasSidebar = !!(sidebarActions && sidebarTopSection);
+  const hasControls = !!(controlsLeft && controlsRight);
+
+  // If neither layout exists, do nothing (avoid crashing)
+  if (!hasSidebar && !hasControls) return;
+
+  // ---------- Clear button ----------
   if (!document.getElementById("clearChatBtn")) {
     const clearBtn = document.createElement("button");
     clearBtn.id = "clearChatBtn";
@@ -265,9 +274,54 @@ function ensureUtilityButtons() {
     clearBtn.textContent = "Clear";
     clearBtn.addEventListener("click", () => clearConversation(true));
 
-    // Put Clear at top of Actions list
-    sidebarActions.prepend(clearBtn);
+    if (hasSidebar) sidebarActions.prepend(clearBtn);
+    else controlsRight.prepend(clearBtn);
   }
+
+  // ---------- Scripts button ----------
+  if (!document.getElementById("scriptsBtn")) {
+    const scriptsBtn = document.createElement("button");
+    scriptsBtn.id = "scriptsBtn";
+    scriptsBtn.type = "button";
+    scriptsBtn.className = "btn secondary";
+    scriptsBtn.textContent = "Scripts";
+    scriptsBtn.title = "Upload/select saved scripts to reference during troubleshooting";
+    scriptsBtn.addEventListener("click", () => openScriptsModal());
+
+    if (hasSidebar) {
+      scriptsBtn.style.width = "100%";
+      // add a little spacing if desired
+      const spacer = document.createElement("div");
+      spacer.style.height = "10px";
+      sidebarTopSection.appendChild(spacer);
+      sidebarTopSection.appendChild(scriptsBtn);
+    } else {
+      controlsLeft.appendChild(scriptsBtn);
+    }
+  }
+
+  // ---------- Settings button ----------
+  if (!document.getElementById("settingsBtn")) {
+    const settingsBtn = document.createElement("button");
+    settingsBtn.id = "settingsBtn";
+    settingsBtn.type = "button";
+    settingsBtn.className = "btn secondary";
+    settingsBtn.textContent = "Settings";
+    settingsBtn.addEventListener("click", () => openSettingsModal());
+
+    if (hasSidebar) {
+      settingsBtn.style.width = "100%";
+      sidebarTopSection.appendChild(settingsBtn);
+    } else {
+      controlsLeft.appendChild(settingsBtn);
+    }
+  }
+
+  // Ensure modal infra exists
+  injectModalCssOnce();
+  ensureSettingsModal();
+  ensureScriptsModal();
+}
 
   // Scripts button (goes in sidebar top section, near mode/toggle)
   if (!document.getElementById("scriptsBtn")) {
