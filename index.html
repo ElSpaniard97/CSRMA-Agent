@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Jenko</title>
+  <title>Infra Troubleshooting Agent</title>
   <meta name="description" content="Restricted access. Login required." />
 
   <link rel="stylesheet" href="./main.css?v=4" />
@@ -36,7 +36,7 @@
           </div>
         </div>
 
-<form id="loginForm" onsubmit="return false;" style="display:grid; gap:10px; margin-top:14px;">
+        <form id="loginForm" onsubmit="return false;" style="display:grid; gap:10px; margin-top:14px;">
           <input id="loginUser" class="input" placeholder="Username" autocomplete="username" required />
           <input id="loginPass" class="input" placeholder="Password" type="password" autocomplete="current-password" required />
           <button class="btn primary" type="submit">Login</button>
@@ -52,23 +52,25 @@
 
   <!-- APP (hidden until authenticated) -->
   <main id="appShell" class="appLayout hidden">
+
     <!-- SIDEBAR -->
-    <div class="sidebarHeader">
-  <div class="sidebarHeaderRow">
-    <div class="brand">
-      <div class="logo">AI</div>
-      <div class="sidebarBrandText">
-        <div class="sidebarTitle">Jenko</div>
-        <div class="sidebarSubtitle">Diagnostics-first</div>
+    <aside class="sidebar" aria-label="Sidebar">
+
+      <div class="sidebarHeader">
+        <div class="sidebarHeaderRow">
+          <div class="brand">
+            <div class="logo">AI</div>
+            <div class="sidebarBrandText">
+              <div class="sidebarTitle">Jenko</div>
+              <div class="sidebarSubtitle">Diagnostics-first</div>
+            </div>
+          </div>
+
+          <button class="iconBtn" type="button" id="sidebarToggle" aria-label="Collapse sidebar" title="Collapse sidebar">
+            <span class="iconChevron" aria-hidden="true">❮</span>
+          </button>
+        </div>
       </div>
-    </div>
-
-    <button class="iconBtn" type="button" id="sidebarToggle" aria-label="Collapse sidebar" title="Collapse sidebar">
-      <span class="iconChevron" aria-hidden="true">❮</span>
-    </button>
-  </div>
-</div>
-
 
       <div class="sidebarSection">
         <span class="pill" id="modePill">Mode: Diagnostics</span>
@@ -103,94 +105,93 @@
 
       <div class="sidebarFooter">
         <button class="btn secondary" type="button" id="logoutBtn" title="Sign out" style="width:100%;">Logout</button>
-        </div>
       </div>
+
     </aside>
 
     <!-- MAIN CHAT PANEL -->
     <section class="mainPanel" aria-label="Chat panel">
-  <header class="topHeader">
-    <div>
-      <h1 class="topTitle">Jenko</h1>
-    </div>
-  </header>
 
-  <!-- Investigation starter card (matches screenshot) -->
-  <section class="card heroCard" aria-label="Start a new investigation">
-    <div class="heroTitle">Start a new investigation</div>
-    </div>
-
-    <div class="presetGrid" aria-label="Preset intake templates">
-      <button class="presetCard" type="button" data-preset="network">
-        <div class="presetHeader">
-          <span class="presetIcon">◌</span>
-          <span class="presetName">Network</span>
+      <header class="topHeader">
+        <div>
+          <h1 class="topTitle">Jenko</h1>
         </div>
-        <div class="presetDesc">Investigate switch/router issues, VLANs, routing, packet loss, and more.</div>
-        <div class="presetCta">Load Template</div>
-      </button>
+      </header>
 
-      <button class="presetCard" type="button" data-preset="server">
-        <div class="presetHeader">
-          <span class="presetIcon">≡</span>
-          <span class="presetName">Server</span>
+      <!-- Investigation starter card (matches screenshot) -->
+      <section class="card heroCard" aria-label="Start a new investigation">
+        <div class="heroTitle">Start a new investigation</div>
+
+        <div class="presetGrid" aria-label="Preset intake templates">
+          <button class="presetCard" type="button" data-preset="network">
+            <div class="presetHeader">
+              <span class="presetIcon">◌</span>
+              <span class="presetName">Network</span>
+            </div>
+            <div class="presetDesc">Investigate switch/router issues, VLANs, routing, packet loss, and more.</div>
+            <div class="presetCta">Load Template</div>
+          </button>
+
+          <button class="presetCard" type="button" data-preset="server">
+            <div class="presetHeader">
+              <span class="presetIcon">≡</span>
+              <span class="presetName">Server</span>
+            </div>
+            <div class="presetDesc">Diagnose Linux/Windows issues, logs, CPU/memory/disk, services.</div>
+            <div class="presetCta">Load Template</div>
+          </button>
+
+          <button class="presetCard" type="button" data-preset="script">
+            <div class="presetHeader">
+              <span class="presetIcon">&lt;/&gt;</span>
+              <span class="presetName">Script</span>
+            </div>
+            <div class="presetDesc">Debug PowerShell, Python, Bash, IaC, validate YAML/JSON.</div>
+            <div class="presetCta">Load Template</div>
+          </button>
+
+          <button class="presetCard" type="button" data-preset="hardware">
+            <div class="presetHeader">
+              <span class="presetIcon">▦</span>
+              <span class="presetName">Hardware</span>
+            </div>
+            <div class="presetDesc">Check server alerts, RAID status, iLO/iDRAC logs, ECC memory.</div>
+            <div class="presetCta">Load Template</div>
+          </button>
         </div>
-        <div class="presetDesc">Diagnose Linux/Windows issues, logs, CPU/memory/disk, services.</div>
-        <div class="presetCta">Load Template</div>
-      </button>
+      </section>
 
-      <button class="presetCard" type="button" data-preset="script">
-        <div class="presetHeader">
-          <span class="presetIcon">&lt;/&gt;</span>
-          <span class="presetName">Script</span>
+      <!-- Chat transcript -->
+      <section class="card chatWrap" aria-label="Chat">
+        <div class="chat" id="chat" aria-label="Chat transcript"></div>
+      </section>
+
+      <!-- Sticky composer (matches screenshot layout) -->
+      <section class="composerDock" aria-label="Message input">
+        <div class="card composerWrap">
+          <form class="composer" id="form">
+            <label class="attachBtn" title="Attach a screenshot (no secrets)">
+              <input type="file" id="image" accept="image/*" />
+              <span class="attachPlus">+</span>
+            </label>
+
+            <textarea
+              id="message"
+              class="input composerInput"
+              rows="2"
+              placeholder="Ask anything"
+              required
+            ></textarea>
+
+            <button class="btn primary sendBtn" type="submit" id="sendBtn">Send</button>
+          </form>
+
+          <div class="toast" id="toast" role="status" aria-live="polite"></div>
         </div>
-        <div class="presetDesc">Debug PowerShell, Python, Bash, IaC, validate YAML/JSON.</div>
-        <div class="presetCta">Load Template</div>
-      </button>
+      </section>
 
-      <button class="presetCard" type="button" data-preset="hardware">
-        <div class="presetHeader">
-          <span class="presetIcon">▦</span>
-          <span class="presetName">Hardware</span>
-        </div>
-        <div class="presetDesc">Check server alerts, RAID status, iLO/iDRAC logs, ECC memory.</div>
-        <div class="presetCta">Load Template</div>
-      </button>
-    </div>
-  </section>
-
-  <!-- Chat transcript -->
-  <section class="card chatWrap" aria-label="Chat">
-    <div class="chat" id="chat" aria-label="Chat transcript"></div>
-  </section>
-
-  <!-- Sticky composer (matches screenshot layout) -->
-  <section class="composerDock" aria-label="Message input">
-    <div class="card composerWrap">
-      <form class="composer" id="form">
-        <label class="attachBtn" title="Attach a screenshot (no secrets)">
-          <input type="file" id="image" accept="image/*" />
-          <span class="attachPlus">+</span>
-        </label>
-
-        <textarea
-          id="message"
-          class="input composerInput"
-          rows="2"
-          placeholder="Ask anything"
-          required
-        ></textarea>
-
-        <button class="btn primary sendBtn" type="submit" id="sendBtn">Send</button>
-      </form>
-
-      </div>
-    </div>
-
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  </section>
-</section>
-
+    </section>
+  </main>
 
   <!-- Backend URLs -->
   <script>
