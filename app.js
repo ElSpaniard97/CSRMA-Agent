@@ -157,7 +157,7 @@ function setSelectedScriptIds(ids) {
 }
 
 /* =========================
-   Inject minimal modal styles (so you donâ€™t have to edit CSS)
+   Inject minimal modal styles (so you don't have to edit CSS)
 ========================= */
 function injectModalCssOnce() {
   if (document.getElementById("scriptModalCss")) return;
@@ -255,7 +255,7 @@ function ensureUtilityButtons() {
   const sidebarActions = document.getElementById("sidebarActions");
   const sidebarTopSection = document.querySelector(".sidebarSection"); // first section with mode/toggle
 
-  // Backward-compatible fallback (if you ever restore the old top bar)
+  // Backward-compatible fallback (if old top bar exists)
   const controlsLeft = document.querySelector(".controls .left");
   const controlsRight = document.querySelector(".controls .right");
 
@@ -265,7 +265,7 @@ function ensureUtilityButtons() {
   // If neither layout exists, do nothing (avoid crashing)
   if (!hasSidebar && !hasControls) return;
 
-  // ---------- Clear button ----------
+  // Clear button (goes above exports for quick access)
   if (!document.getElementById("clearChatBtn")) {
     const clearBtn = document.createElement("button");
     clearBtn.id = "clearChatBtn";
@@ -278,7 +278,7 @@ function ensureUtilityButtons() {
     else controlsRight.prepend(clearBtn);
   }
 
-  // ---------- Scripts button ----------
+  // Scripts button (sidebar top section)
   if (!document.getElementById("scriptsBtn")) {
     const scriptsBtn = document.createElement("button");
     scriptsBtn.id = "scriptsBtn";
@@ -290,7 +290,6 @@ function ensureUtilityButtons() {
 
     if (hasSidebar) {
       scriptsBtn.style.width = "100%";
-      // add a little spacing if desired
       const spacer = document.createElement("div");
       spacer.style.height = "10px";
       sidebarTopSection.appendChild(spacer);
@@ -300,7 +299,7 @@ function ensureUtilityButtons() {
     }
   }
 
-  // ---------- Settings button ----------
+  // Settings button (sidebar top section)
   if (!document.getElementById("settingsBtn")) {
     const settingsBtn = document.createElement("button");
     settingsBtn.id = "settingsBtn";
@@ -315,67 +314,6 @@ function ensureUtilityButtons() {
     } else {
       controlsLeft.appendChild(settingsBtn);
     }
-  }
-
-  // Ensure modal infra exists
-  injectModalCssOnce();
-  ensureSettingsModal();
-  ensureScriptsModal();
-}
-
-  // Scripts button (goes in sidebar top section, near mode/toggle)
-  if (!document.getElementById("scriptsBtn")) {
-    const scriptsBtn = document.createElement("button");
-    scriptsBtn.id = "scriptsBtn";
-    scriptsBtn.type = "button";
-    scriptsBtn.className = "btn secondary";
-    scriptsBtn.textContent = "Scripts";
-    scriptsBtn.title = "Upload/select saved scripts to reference during troubleshooting";
-    scriptsBtn.style.width = "100%";
-    scriptsBtn.addEventListener("click", () => openScriptsModal());
-
-    sidebarTopSection.appendChild(document.createElement("div")).style.height = "10px";
-    sidebarTopSection.appendChild(scriptsBtn);
-  }
-
-  // Settings button (also in sidebar top section)
-  if (!document.getElementById("settingsBtn")) {
-    const settingsBtn = document.createElement("button");
-    settingsBtn.id = "settingsBtn";
-    settingsBtn.type = "button";
-    settingsBtn.className = "btn secondary";
-    settingsBtn.textContent = "Settings";
-    settingsBtn.style.width = "100%";
-    settingsBtn.addEventListener("click", () => openSettingsModal());
-
-    sidebarTopSection.appendChild(settingsBtn);
-  }
-
-  injectModalCssOnce();
-  ensureSettingsModal();
-  ensureScriptsModal();
-
-  }
-
-  if (!document.getElementById("scriptsBtn")) {
-    const scriptsBtn = document.createElement("button");
-    scriptsBtn.id = "scriptsBtn";
-    scriptsBtn.type = "button";
-    scriptsBtn.className = "btn secondary";
-    scriptsBtn.textContent = "Scripts";
-    scriptsBtn.title = "Upload/select saved scripts to reference during troubleshooting";
-    scriptsBtn.addEventListener("click", () => openScriptsModal());
-    controlsLeft.appendChild(scriptsBtn);
-  }
-
-  if (!document.getElementById("settingsBtn")) {
-    const settingsBtn = document.createElement("button");
-    settingsBtn.id = "settingsBtn";
-    settingsBtn.type = "button";
-    settingsBtn.className = "btn secondary";
-    settingsBtn.textContent = "Settings";
-    settingsBtn.addEventListener("click", () => openSettingsModal());
-    controlsLeft.appendChild(settingsBtn);
   }
 
   injectModalCssOnce();
@@ -484,7 +422,7 @@ function wireSettingsModalButtons() {
           defaultPreset: document.getElementById("settingDefaultPreset").value,
           expandOnPreset: document.getElementById("settingExpandOnPreset").value === "true",
           defaultApproval: document.getElementById("settingDefaultApproval").value === "true",
-          rememberApproval: true // reserved for later; keeping true by default
+          rememberApproval: true
         };
 
         // optimistic apply
@@ -563,7 +501,7 @@ function ensureScriptsModal() {
         <div class="row2">
           <label class="field">
             <span class="fieldLabel">Language (optional)</span>
-            <input class="input" id="scriptLang" placeholder="PowerShell, Python, Bashâ€¦" />
+            <input class="input" id="scriptLang" placeholder="PowerShell, Python, Bash..." />
           </label>
 
           <label class="field">
@@ -635,11 +573,13 @@ function wireScriptsModalButtons() {
 
         await apiUploadScript({ file, name, language, tags });
         toast("Script uploaded.");
+
         // clear inputs
         fileInput.value = "";
         document.getElementById("scriptName").value = "";
         document.getElementById("scriptLang").value = "";
         document.getElementById("scriptTags").value = "";
+
         await refreshScriptsList();
       } catch (err) {
         if (String(err?.message) === "unauthorized") return forceLogout("Session expired. Please sign in again.");
@@ -653,7 +593,7 @@ async function refreshScriptsList() {
   const list = document.getElementById("scriptList");
   if (!list) return;
 
-  list.textContent = "Loadingâ€¦";
+  list.textContent = "Loading...";
   try {
     const scripts = await apiListScripts();
     renderScripts(scripts);
@@ -713,8 +653,8 @@ function renderScripts(scripts) {
 
     const sub = document.createElement("div");
     sub.className = "scriptSub";
-    const tags = Array.isArray(s.tags) && s.tags.length ? ` â€¢ tags: ${s.tags.join(", ")}` : "";
-    sub.textContent = `${s.language || "Text"} â€¢ ${s.size || 0} chars${tags}`;
+    const tags = Array.isArray(s.tags) && s.tags.length ? ` • tags: ${s.tags.join(", ")}` : "";
+    sub.textContent = `${s.language || "Text"} • ${s.size || 0} chars${tags}`;
 
     meta.appendChild(name);
     meta.appendChild(sub);
@@ -756,7 +696,6 @@ function renderScripts(scripts) {
     delBtn.addEventListener("click", async () => {
       try {
         await apiDeleteScript(s.id);
-        // also detach if selected
         const ids = getSelectedScriptIds().filter((x) => x !== s.id);
         setSelectedScriptIds(ids);
         toast("Deleted.");
@@ -1024,7 +963,7 @@ form?.addEventListener("submit", async (e) => {
 
   messageEl.value = "";
 
-  const working = addBubble("assistant", "Analyzingâ€¦ diagnostics in progressâ€¦");
+  const working = addBubble("assistant", "Analyzing… diagnostics in progress…");
 
   try {
     const fd = new FormData();
@@ -1068,7 +1007,7 @@ loginForm?.addEventListener("submit", async (e) => {
     const password = (loginPass?.value || "").trim();
     if (!username || !password) return toast("Enter username and password.");
 
-    authStatus && (authStatus.textContent = "Signing inâ€¦");
+    authStatus && (authStatus.textContent = "Signing in...");
 
     const resp = await fetch(window.LOGIN_URL, {
       method: "POST",
@@ -1095,7 +1034,6 @@ loginForm?.addEventListener("submit", async (e) => {
       cacheSettings({ ...defaultSettings(), ...s });
       applySettingsToUI(loadCachedSettings());
     } catch {
-      // fall back to cached
       applySettingsToUI(loadCachedSettings());
     }
 
