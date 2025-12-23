@@ -1007,3 +1007,84 @@ html[data-theme="light"] ::-webkit-scrollbar-thumb{ background: rgba(10,20,40,.1
     display: initial !important;
   }
 }
+
+/* =========================
+   FIX: Remediation toggle alignment / thumb drift
+========================= */
+.toggle{
+  align-items: center;
+}
+
+.toggleUi{
+  /* stable sizing */
+  width: 44px;
+  height: 24px;
+  display: inline-block;
+  position: relative;
+
+  /* visual */
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.10);
+}
+
+/* Use computed positions instead of hard-coded px */
+.toggleUi::after{
+  content:"";
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,.92);
+  transition: left 180ms var(--ease), background 180ms var(--ease);
+}
+
+html[data-theme="light"] .toggleUi::after{
+  background: rgba(10,20,40,.92);
+}
+
+.toggle input:checked + .toggleUi::after{
+  /* 44 track - 18 thumb - 3px left padding = 23px */
+  left: calc(100% - 18px - 3px);
+  background: rgba(16,185,129,.95);
+}
+
+/* =========================
+   FIX: Toggle overlap (label vs switch)
+   Make it a 2-column row: text left, switch right
+========================= */
+.toggle{
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 12px;
+
+  /* keep your pill-like look */
+  padding: 10px 12px;
+}
+
+/* Let the label safely wrap instead of being overlapped */
+.toggleText{
+  min-width: 0;
+  white-space: normal;
+  line-height: 1.25;
+}
+
+/* Lock the right cluster to the end, no shrinking */
+.toggle > span:last-child{
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+}
+
+/* Optional: if you want single-line label with ellipsis instead of wrapping */
+.toggle.singleLine .toggleText{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
