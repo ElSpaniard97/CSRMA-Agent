@@ -1147,3 +1147,55 @@ html[data-sidebar="collapsed"] .sidebar .btn{
 html[data-sidebar="collapsed"] .sidebar .sidebarSection:first-of-type{
   display: none;
 }
+/* ==========================================================
+   COLLAPSED SIDEBAR = ICON RAIL ONLY
+   Show ONLY the expand button when collapsed
+========================================================== */
+
+/* Lock sidebar as a narrow rail */
+html[data-sidebar="collapsed"] .sidebar{
+  width: var(--sidebar-collapsed) !important;
+  padding: 10px 6px !important;
+  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Keep ONLY the header (logo + toggle) */
+html[data-sidebar="collapsed"] .sidebar > :not(.sidebarHeader){
+  display: none !important;
+}
+
+/* Center header content vertically */
+html[data-sidebar="collapsed"] .sidebarHeader{
+  padding: 0 !important;
+  width: 100%;
+}
+
+/* Header row becomes vertical */
+html[data-sidebar="collapsed"] .sidebarHeaderRow{
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Hide brand text, keep logo */
+html[data-sidebar="collapsed"] .sidebarBrandText{
+  display: none !important;
+}
+
+/* Ensure toggle button is always visible & centered */
+html[data-sidebar="collapsed"] #sidebarToggle{
+  width: 40px;
+  height: 40px;
+}
+
+/* Prevent ANY children from bleeding horizontally */
+html[data-sidebar="collapsed"] .sidebar,
+html[data-sidebar="collapsed"] .sidebar *{
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  box-sizing: border-box;
+}
