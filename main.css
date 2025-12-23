@@ -937,7 +937,7 @@ html[data-theme="light"] ::-webkit-scrollbar-thumb{ background: rgba(10,20,40,.1
 ========================= */
 .composerWrap{
   /* give the contents breathing room from the rounded corners */
-  padding: 14px;
+  padding: 16px;
   border-radius: var(--radius-lg);
 
   /* ensures children never visually protrude past the card radius */
