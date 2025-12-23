@@ -931,3 +931,34 @@ html[data-theme="light"] *{ scrollbar-color: rgba(10,20,40,.22) transparent; }
 }
 html[data-theme="light"] ::-webkit-scrollbar-thumb{ background: rgba(10,20,40,.18); }
 ::-webkit-scrollbar-track{ background: transparent; }
+
+/* =========================
+   FIX: Composer buttons clipping into card corners
+========================= */
+.composerWrap{
+  /* give the contents breathing room from the rounded corners */
+  padding: 14px;
+  border-radius: var(--radius-lg);
+
+  /* ensures children never visually protrude past the card radius */
+  overflow: hidden;
+}
+
+/* In CSS grid, inputs can overflow unless you allow them to shrink */
+.composer > *{
+  min-width: 0;
+}
+
+/* Ensure the textarea truly behaves like a grid item */
+.composerInput{
+  width: 100%;
+  min-width: 0;
+}
+
+/* Make left (+) and right (Send) align cleanly with the textarea */
+.attachBtn,
+.sendBtn{
+  height: 56px;          /* matches composerInput min-height */
+  align-self: end;       /* aligns to bottom edge of the grid row */
+  border-radius: var(--radius-sm);
+}
